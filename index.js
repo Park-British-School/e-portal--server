@@ -27,8 +27,8 @@ const {
 const server = express();
 server.use(express.json({ limit: "50mb" }));
 server.use(express.urlencoded({ limit: "50mb", extended: true }));
-server.use("/", express.static(__dirname));
 server.use(cors());
+server.use("/", express.static(__dirname));
 server.use("/admins", adminRouter);
 server.use("/students", studentRouter);
 server.use("/teachers", teacherRouter);
@@ -41,9 +41,9 @@ server.use("/invoices", invoiceRouter);
 server.use("/fees", feeRouter);
 server.use("/notifications", notificationRouter);
 
-server.get("/ping", (req, res) => {
-  console.log("request at /testConnection");
-  res.status(200).end();
+server.get("/ping", (request, response) => {
+  console.log("PING!!!");
+  response.status(200).end();
 });
 
 server.listen(process.env.PORT, () => {
