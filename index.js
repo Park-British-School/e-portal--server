@@ -3,7 +3,7 @@ const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-
+const routers = require("./routers");
 mongoose.connect(process.env.MONGOURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -11,32 +11,32 @@ mongoose.connect(process.env.MONGOURI, {
 });
 
 const {
-  studentRoute,
-  teacherRoute,
-  classRoute,
-  resultRoute,
-  imageRoute,
-  adminRoute,
-  termRoute,
-  sessionRoute,
+  studentRouter,
+  teacherRouter,
+  classRouter,
+  resultRouter,
+  imageRouter,
+  adminRouter,
+  termRouter,
+  sessionRouter,
   invoiceRouter,
   feeRouter,
   notificationRouter,
-} = require("./routes");
+} = routers;
 
 const server = express();
 server.use(express.json({ limit: "50mb" }));
 server.use(express.urlencoded({ limit: "50mb", extended: true }));
 server.use("/", express.static(__dirname));
 server.use(cors());
-server.use("/admins", adminRoute);
-server.use("/students", studentRoute);
-server.use("/teachers", teacherRoute);
-server.use("/classes", classRoute);
-server.use("/results", resultRoute);
-server.use("/images", imageRoute);
-server.use("/term", termRoute);
-server.use("/session", sessionRoute);
+server.use("/admins", adminRouter);
+server.use("/students", studentRouter);
+server.use("/teachers", teacherRouter);
+server.use("/classes", classRouter);
+server.use("/results", resultRouter);
+server.use("/images", imageRouter);
+server.use("/term", termRouter);
+server.use("/session", sessionRouter);
 server.use("/invoices", invoiceRouter);
 server.use("/fees", feeRouter);
 server.use("/notifications", notificationRouter);
