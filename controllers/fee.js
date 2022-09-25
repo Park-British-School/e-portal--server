@@ -32,7 +32,3 @@ exports.deleteFee = async function (req, res) {
   await FeeModel.deleteOne({ _id: feeID })
   res.status(200).json({})
 }
-
-exports.getAllInvoices = async function (req, res) {
-
-}

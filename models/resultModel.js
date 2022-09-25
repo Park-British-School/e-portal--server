@@ -1,49 +1,49 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const resultSchema = mongoose.Schema({
   student: {
     type: String,
     ref: "Student",
-    required: true
+    required: true,
   },
   school: {
     type: String,
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    required: true
+    required: true,
   },
   class: {
     type: mongoose.Types.ObjectId,
     ref: "Class",
-    required: true
+    required: true,
   },
   session: {
     type: String,
-    required: true
+    required: true,
   },
   term: {
     type: String,
-    required: true
+    required: true,
   },
   scoreSheet: {
     type: String,
-    required: true
+    required: true,
   },
   overallGrade: {
-    type: String
+    type: String,
   },
   overallPercentage: {
-    type: Number
+    type: Number,
   },
   teachersRemark: {
     type: String,
-    required: true
+    required: true,
   },
   teachersRemark: {
     type: String,
-    required: true
+    required: true,
   },
   principalsRemark: {
     type: String,
@@ -56,28 +56,38 @@ const resultSchema = mongoose.Schema({
   },
   uploadedAt: {
     type: Date,
-    default: () => new Date().getTime()
+    default: () => new Date().getTime(),
   },
   uploadedBy: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref: "Teacher"
+    ref: "Teacher",
   },
   isApproved: {
     type: Boolean,
     required: true,
-    default: false
+    default: false,
   },
   type: {
     type: String,
-    required: true
+    required: true,
   },
-  comments:{
+  comments: {
     type: String,
-    default: "N/A"
-  }
-})
+    default: "N/A",
+  },
+});
 
-const Result = mongoose.model('Result', resultSchema)
+resultSchema.static("findAll", function (callback) {
+  return this.find({}, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents);
+    }
+  });
+});
 
-module.exports = Result
+const Result = mongoose.model("Result", resultSchema);
+
+module.exports = Result;

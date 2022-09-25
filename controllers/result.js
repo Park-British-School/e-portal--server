@@ -139,11 +139,21 @@ exports.downloadResult = async function (req, res, next) {
 };
 
 exports.countAllResults = function (callback) {
-  Result.count({}, (error, count) => {
+  Result.countDocuments({}, (error, count) => {
     if (error) {
       callback(error, null);
     } else {
       callback(null, count);
+    }
+  });
+};
+
+exports.findAllResults = async function (callback) {
+  Result.findAll((error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents);
     }
   });
 };
