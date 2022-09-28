@@ -22,6 +22,7 @@ const {
   invoiceRouter,
   feeRouter,
   notificationRouter,
+  authRouter,
 } = routers;
 
 const server = express();
@@ -40,6 +41,7 @@ server.use("/session", sessionRouter);
 server.use("/invoices", invoiceRouter);
 server.use("/fees", feeRouter);
 server.use("/notifications", notificationRouter);
+server.use("/auth", authRouter);
 
 server.get("/ping", (request, response) => {
   console.log("PING!!!");
