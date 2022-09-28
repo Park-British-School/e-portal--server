@@ -1,13 +1,13 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const teacherSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    required: true
+    required: true,
   },
   lastName: {
     type: String,
-    required: true
+    required: true,
   },
   gender: {
     type: String,
@@ -19,39 +19,80 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     lowercase: true,
     enum: ["single", "married"],
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   role: {
     type: String,
     lowercase: true,
-    default: "teacher"
+    default: "teacher",
   },
   address: {
     type: String,
-    required: true
+    required: true,
   },
   status: {
     type: String,
-    default: "active"
+    default: "active",
   },
   createdAt: {
     type: Date,
-    default: () => new Date().getTime()
+    default: () => new Date().getTime(),
   },
   lastSeen: {
     type: Date,
-    default: () => new Date().getTime()
-  }
-})
+    default: () => new Date().getTime(),
+  },
+});
 
-const Teacher = mongoose.model('Teacher', teacherSchema)
+// REFACTORING STARTS HERE
+teacherSchema.static("findAll", function (callback) {
+  return this.find({}, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents);
+    }
+  });
+});
 
-module.exports = Teacher
+teacherSchema.static("findByID", function (ID, callback) {
+  return this.find({ _id: ID }, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      if (documents.length === 0) {
+        callback(null, null);
+      } else {
+        callback(null, documents[0]);
+      }
+    }
+  });
+});
+
+teacherSchema.static("findByName", function (name, callback) {
+  return this.find(
+    {
+      $or: [{ firstName: name }, { lastName: name }],
+    },
+    (error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents[0]);
+      }
+    }
+  );
+});
+//REFACTORING ENDS HERE
+
+const Teacher = mongoose.model("Teacher", teacherSchema);
+
+module.exports = Teacher;
