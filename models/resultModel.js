@@ -102,8 +102,6 @@ resultSchema.static("findByID", function (ID, callback) {
   });
 });
 
-
-
 const Result = mongoose.model("Result", resultSchema);
 
 module.exports = Result;
