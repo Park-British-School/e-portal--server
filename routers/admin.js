@@ -1,9 +1,11 @@
-const router = require('express').Router()
-const {getAllAdmins, getAdmin, addAdmin, login} = require("../controllers/adminController")
+const router = require("express").Router();
+const controllers = require("../controllers");
 
-router.get("/", getAllAdmins)
-router.get("/:id", getAdmin)
-router.post("/addAdmin", addAdmin)
-router.post("/signin", login)
+const { adminController } = controllers;
 
-module.exports = router
+// router.get("/", getAllAdmins);
+// router.get("/:id", getAdmin);
+// router.post("/addAdmin", addAdmin);
+// router.post("/signin", login);
+
+module.exports = router;
