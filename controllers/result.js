@@ -138,6 +138,7 @@ exports.downloadResult = async function (req, res, next) {
   }
 };
 
+// REFACTRING STARTS HERE
 exports.countAllResults = function (callback) {
   Result.countDocuments({}, (error, count) => {
     if (error) {
@@ -157,3 +158,27 @@ exports.findAllResults = async function (callback) {
     }
   });
 };
+
+exports.findResultbyID = async function (ID, callback){
+  Result.findByID(ID, (error, document)=>{
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, document);
+    }
+  })
+}
+
+exports.findResultsByStudentID = async function(studentID, callback){
+  Result.findResultByStudentID(studentID, (error, document)=>{
+    if(error){
+      callback(error, null)
+    }
+    else{
+      callback(null, document)
+    }
+  })
+}
+
+
+// REFACTRING ENDS HERE
