@@ -88,6 +88,22 @@ resultSchema.static("findAll", function (callback) {
   });
 });
 
+resultSchema.static("findByID", function (ID, callback) {
+  return this.find({ _id: ID }, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      if (documents.length === 0) {
+        callback(null, null);
+      } else {
+        callback(null, documents[0]);
+      }
+    }
+  });
+});
+
+
+
 const Result = mongoose.model("Result", resultSchema);
 
 module.exports = Result;
