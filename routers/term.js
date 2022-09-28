@@ -1,8 +1,10 @@
-const router = require('express').Router()
-const {getTerm, setTerm} = require('../controllers/termController')
+const router = require("express").Router();
+const controllers = require("../controllers");
 
-router.get("/", getTerm)
+const { termController } = controllers;
 
-router.post("/set", setTerm)
+router.get("/", termController.getTerm);
 
-module.exports = router
+router.post("/set", termController.setTerm);
+
+module.exports = router;

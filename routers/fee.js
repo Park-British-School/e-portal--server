@@ -1,16 +1,13 @@
 const express = require('express')
-const {
-  getAllFees,
-  createFee,
-  deleteFee,
-  getAllInvoices,
-} = require("../controllers/billingController")
+const controllers = require('../controllers')
 const { Router } = express
+
+const {feeController} = controllers
 
 const feeRouter = Router()
 
-feeRouter.get("/", getAllFees)
-feeRouter.post("/", createFee)
-feeRouter.delete("/:feeID", deleteFee)
+feeRouter.get("/", feeController.getAllFees)
+feeRouter.post("/", feeController.createFee)
+feeRouter.delete("/:feeID", feeController.deleteFee)
 
 module.exports = feeRouter

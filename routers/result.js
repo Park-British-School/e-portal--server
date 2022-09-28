@@ -1,26 +1,17 @@
 const router = require("express").Router();
-const {
-  getAllResults,
-  getResult,
-  addResult,
-  deleteResult,
-  editResult,
-  approveResult,
-  getResultsByClass,
-  downloadResult,
-
-  countAllResults,
-  findAllResults,
-} = require("../controllers/resultController");
+const controllers = require("../controllers");
 const aggregateScores = require("../middlewares/aggregateScores");
 const generateResultPDF = require("../middlewares/generateResultPDF");
 
+const { resultController } = controllers;
+
 // TO BE REMOVED AFTER STABLE
-router.get("/", getAllResults);
+router.get("/", resultController.getAllResults);
 // END
 
+// REFACTORING STARTS HERE
 router.get("/find-all", (request, response) => {
-  findAllResults((error, results) => {
+  resultController.findAllResults((error, results) => {
     if (error) {
       response.status(400).send(error);
     } else {
@@ -30,7 +21,7 @@ router.get("/find-all", (request, response) => {
 });
 
 router.get("/find", (request, response) => {
-  findAllResults((error, results) => {
+  resultController.findAllResults((error, results) => {
     if (error) {
       response.status(400).send(error);
     } else {
@@ -40,7 +31,7 @@ router.get("/find", (request, response) => {
 });
 
 router.get("/count-all", (request, response) => {
-  countAllResults((error, count) => {
+  resultController.countAllResults((error, count) => {
     if (error) {
       response.status(400).send(error);
     } else {
@@ -49,12 +40,35 @@ router.get("/count-all", (request, response) => {
   });
 });
 
-router.get("/:id", getResult);
-router.get("/class/:classID", getResultsByClass);
-router.post("/", aggregateScores, addResult);
-router.post("/:resultID/edit", editResult);
-router.get("/:resultID/approve", approveResult);
-router.get("/:resultID/download", downloadResult, generateResultPDF);
-router.get("/delete/:resultID", deleteResult);
+router.get("/find-one", (request, response) => {
+  switch (request.query.by) {
+    case ID:
+      resultController.findResultbyID(request.query.ID, (error, result) => {
+        if (error) {
+          response.status(400).send(error);
+        } else {
+          if (result) {
+            response.status(200).json(result);
+          } else {
+            response.status(400).send(error);
+          }
+        }
+      });
+      break;
+
+    default:
+      response.status(400).send("Incorrect query parameters");
+      break;
+  }
+});
+// REFACTORING ENDS HERE
+
+// router.get("/:id", getResult);
+// router.get("/class/:classID", getResultsByClass);
+// router.post("/", aggregateScores, addResult);
+// router.post("/:resultID/edit", editResult);
+// router.get("/:resultID/approve", approveResult);
+// router.get("/:resultID/download", downloadResult, generateResultPDF);
+// router.get("/delete/:resultID", deleteResult);
 
 module.exports = router;

@@ -1,9 +1,10 @@
-const router = require('express').Router()
-const {getSession, setSession} = require('../controllers/sessionController')
+const router = require("express").Router();
+const controllers = require("../controllers");
 
+const { sessionController } = controllers;
 
-router.get("/", getSession)
+router.get("/", sessionController.getSession);
 
-router.post("/set", setSession)
+router.post("/set", sessionController.setSession);
 
-module.exports = router
+module.exports = router;
