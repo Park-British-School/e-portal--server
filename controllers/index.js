@@ -8,6 +8,7 @@ const feeController = require("./fee");
 const termController = require("./term");
 const sessionController = require("./session");
 const teacherController = require('./teacher')
+const authController = require('./auth')
 
 module.exports = {
   invoiceController,
@@ -19,5 +20,6 @@ module.exports = {
   feeController,
   termController,
   sessionController,
-  teacherController
+  teacherController,
+  authController
 };

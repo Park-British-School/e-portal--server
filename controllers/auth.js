@@ -1,82 +1,78 @@
 const jsonwebtoken = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const studentController = require("./student");
-const staffController = require("./staff");
+const teacherController = require("./teacher");
 const adminController = require("./admin");
 
 exports.signin = {
   student: async function (studentID, password, callback) {
-    studentController.findStudentByID(
-      studentID,
-      {
-        populateNotifications: false,
-        populateClass: false,
-        populateInvoices: false,
-        populateResults: false,
-      },
-      (error, student) => {
-        if (error) {
-          callback(error, null);
-        } else {
-          if (student) {
-            bcrypt
-              .compare(password, student.password)
-              .then((match) => {
-                if (match) {
-                  if (student.status === "banned") {
-                    callback(
-                      "This account has been banned, Please contact the administrator.",
-                      null
-                    );
-                  } else {
-                    const accessToken = jsonwebtoken.sign(
-                      { id: student.id, role: "student" },
-                      process.env.TOKEN_SECRET
-                    );
-                    callback(null, accessToken);
-                  }
+    studentController.findStudentByID(studentID, (error, student) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        if (student) {
+          bcrypt
+            .compare(password, student.password)
+            .then((match) => {
+              if (match) {
+                if (
+                  student.status === "banned" ||
+                  student.status === "disabled"
+                ) {
+                  callback(
+                    "This account has been banned, Please contact the administrator.",
+                    null
+                  );
                 } else {
-                  callback("Password and StudentID do not match", null);
+                  const accessToken = jsonwebtoken.sign(
+                    { id: student.id, role: "student" },
+                    process.env.TOKEN_SECRET
+                  );
+                  callback(null, {
+                    accessToken: accessToken,
+                    ...student._doc,
+                  });
                 }
-              })
-              .catch((error) => {
-                callback(error, null);
-              });
-          } else {
-            callback("Invalid student ID", null);
-          }
+              } else {
+                callback("Password and StudentID do not match", null);
+              }
+            })
+            .catch((error) => {
+              callback(error, null);
+            });
+        } else {
+          callback("Invalid student ID", null);
         }
       }
-    );
+    });
   },
-
-  staff: async function (emailAddress, password, callback) {
-    staffController.findByID(emailAddress, (error, staff) => {
+  teacher: async function (email, password, callback) {
+    teacherController.findTeacherByEmailAddress(email, (error, teacher) => {
       if (error) {
         callback(error, null);
       } else {
         bcrypt
-          .compare(password, staff.password)
+          .compare(password, teacher.password)
           .then((match) => {
             if (match) {
-              if (staff.status === "banned") {
+              if (
+                teacher.status === "banned" ||
+                teacher.status === "disabled"
+              ) {
                 callback(
                   "This account has been banned, Please contact the administrator.",
                   null
                 );
-              }
-              if (staff.status === "suspended") {
-                callback(
-                  "This account has been suspended, Please contact the administrator.",
-                  null
-                );
               } else {
                 const accessToken = jsonwebtoken.sign(
-                  { id: staff.id, role: staff.role, subRole: staff.subRole },
+                  {
+                    id: teacher._id,
+                    role: teacher.role,
+                  },
                   process.env.TOKEN_SECRET
                 );
-                staffController.updateStaffByID(
-                  staff.id,
+                teacherController.updateTeacherByID(
+                  teacher._id,
                   {
                     $set: { lastSeen: new Date().getTime() },
                   },
@@ -86,7 +82,7 @@ exports.signin = {
                     } else {
                       callback(null, {
                         accessToken: accessToken,
-                        ...staff._doc,
+                        ...teacher._doc,
                       });
                     }
                   }
@@ -157,4 +153,12 @@ exports.signin = {
   },
 };
 
-exports.verifyAccessToken = async function (accessToken, callback) {};
+exports.verifyAccessToken = async function (accessToken, callback) {
+  jsonwebtoken.verify(accessToken, process.env.TOKEN_SECRET, (error, data) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, data);
+    }
+  });
+};
