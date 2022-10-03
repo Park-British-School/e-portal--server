@@ -149,36 +149,74 @@ exports.countAllResults = function (callback) {
   });
 };
 
-exports.findAllResults = async function (callback) {
-  Result.findAll((error, documents) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      callback(null, documents);
-    }
-  });
+exports.findAllResults = async function (options, callback) {
+  if (options.paginate) {
+    Result.find()
+      .sort({
+        firstName: "asc",
+      })
+      .limit(options.count)
+      .skip(options.count * (options.page - 1))
+      .exec(function (error, results) {
+        callback(null, results);
+      });
+  } else {
+    Result.findAll((error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents);
+      }
+    });
+  }
 };
 
-exports.findResultbyID = async function (ID, callback){
-  Result.findByID(ID, (error, document)=>{
+exports.findResultbyID = async function (ID, callback) {
+  Result.findByID(ID, (error, document) => {
     if (error) {
       callback(error, null);
     } else {
       callback(null, document);
     }
-  })
-}
+  });
+};
 
-exports.findResultsByStudentID = async function(studentID, callback){
-  Result.findResultByStudentID(studentID, (error, document)=>{
-    if(error){
-      callback(error, null)
+exports.findResultsByStudentID = async function (studentID, callback) {
+  Result.findResultByStudentID(studentID, (error, document) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, document);
     }
-    else{
-      callback(null, document)
-    }
-  })
-}
+  });
+};
 
+exports.uploadResult = async function (data, callback) {
+  Student.findById(data.student, (error, student) => {
+    if (student) {
+      Result.create({ ...data })
+        .then((result) => {
+          Student.updateOne(
+            { _id: data.student },
+            { $push: { results: result._id } },
+            (error) => {
+              if (error) {
+                callback(error);
+              } else {
+                callback(null);
+              }
+            }
+          );
+        })
+        .catch((error) => {
+          callback(error);
+        });
+    } else {
+      callback(
+        "This student does not exist!, Please check the ID and try again"
+      );
+    }
+  });
+};
 
 // REFACTRING ENDS HERE
