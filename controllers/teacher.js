@@ -218,4 +218,24 @@ exports.findTeacherByName = async function (name, callback) {
   });
 };
 
+exports.findTeacherByEmailAddress = async function (email, callback) {
+  Teacher.findByEmailAddress(email, (error, document) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, document);
+    }
+  });
+};
+
+exports.updateTeacherByID = async function (ID, update, callback) {
+  Teacher.updateOne({ _id: ID }, { ...update }, (error) => {
+    if (error) {
+      callback(error);
+    } else {
+      callback(null);
+    }
+  });
+};
+
 //REFACTORING ENDS HERE
