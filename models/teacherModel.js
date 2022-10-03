@@ -91,6 +91,16 @@ teacherSchema.static("findByName", function (name, callback) {
     }
   );
 });
+
+teacherSchema.static("findByEmailAddress", function (email, callback) {
+  return this.find({ email: email }, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents[0]);
+    }
+  });
+});
 //REFACTORING ENDS HERE
 
 const Teacher = mongoose.model("Teacher", teacherSchema);
