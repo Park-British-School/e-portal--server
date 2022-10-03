@@ -1,4 +1,5 @@
 const express = require("express");
+const jsonwebtoken = require("jsonwebtoken");
 const controllers = require("../controllers");
 
 const { Router } = express;
@@ -21,9 +22,8 @@ authRouter.post("/sign-in/student", (request, response) => {
 });
 
 authRouter.post("/sign-in/teacher", (request, response) => {
-  authController.staff.signin(
-    request.body.emailAddress,
-    request.body.staffID,
+  authController.signin.teacher(
+    request.body.email,
     request.body.password,
     (error, data) => {
       if (error) {
@@ -51,10 +51,17 @@ authRouter.post("/sign-in/admin", (request, response) => {
 });
 
 authRouter.get("/verify-access-token", (request, response) => {
-  authController.verifyAccessToken(
-    request.query.accessToken,
-    (error, data) => {}
-  );
+  authController.verifyAccessToken(request.query.accessToken, (error, data) => {
+    if (error) {
+      response.status(400).send(error.message);
+    } else {
+      response.status(200).json(data);
+    }
+  });
+});
+
+authRouter.get("/sign-out/student", (request, response) => {
+  authController.signOut.student((error) => {});
 });
 
 module.exports = authRouter;
