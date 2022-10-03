@@ -28,13 +28,20 @@ router.get("/count-all", (request, response) => {
 });
 
 router.get("/find-all", (request, response) => {
-  studentController.findAllStudents((error, students) => {
-    if (error) {
-      response.status(400).send(error);
-    } else {
-      response.status(200).json(students);
+  studentController.findAllStudents(
+    {
+      paginate: request.query.paginate === "true" ? true : false,
+      count: request.query.count ? parseInt(request.query.count) : 10,
+      page: request.query.page ? parseInt(request.query.page) : 1,
+    },
+    (error, students) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).json(students);
+      }
     }
-  });
+  );
 });
 
 router.get("/find-one", (request, response) => {
@@ -81,6 +88,10 @@ router.get("/find-one", (request, response) => {
   } else {
     response.status(400).send("Incorrect query parameters");
   }
+});
+
+router.get("/find", (request, response) => {
+  studentController.findStudents();
 });
 
 module.exports = router;
