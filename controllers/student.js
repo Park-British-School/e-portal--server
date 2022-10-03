@@ -242,8 +242,30 @@ exports.countAllStudents = async function (callback) {
   });
 };
 
-exports.findAllStudents = async function (callback) {
-  Student.findAll((error, document) => {
+exports.findAllStudents = async function (options, callback) {
+  if (options.paginate) {
+    Student.find()
+      .sort({
+        firstName: "asc",
+      })
+      .limit(options.count)
+      .skip(options.count * (options.page - 1))
+      .exec(function (error, students) {
+        callback(null, students);
+      });
+  } else {
+    Student.findAll((error, document) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, document);
+      }
+    });
+  }
+};
+
+exports.findStudentByID = async function (studentID, callback) {
+  Student.findByID(studentID, (error, document) => {
     if (error) {
       callback(error, null);
     } else {
@@ -252,26 +274,16 @@ exports.findAllStudents = async function (callback) {
   });
 };
 
-exports.findStudentByID = async function (studentID, callback) {
-  Student.findByID(studentID, (error, document)=>{
-    if(error){
-      callback(error, null)
+exports.findStudentByName = async function (name, callback) {
+  Student.findByName(name, (error, document) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, document);
     }
-    else{
-      callback(null, document)
-    }
-  })
+  });
 };
 
-exports.findStudentByName = async function (name, callback){
-  Student.findByName(name, (error, document)=>{
-    if(error){
-      callback(error, null)
-    }
-    else{
-      callback(null, document)
-    }
-  })
-}
+exports.findStudents = async function (options, callback) {};
 
 //REFACTORING ENDS HERE
