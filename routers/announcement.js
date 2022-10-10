@@ -7,8 +7,7 @@ const { announcementController } = controllers;
 const announcementRouter = Router();
 
 announcementRouter.get("/find-all", (request, response) => {
-  announcementCo
-  ntroller.findAllAnnouncements((error, announcements) => {
+  announcementController.findAllAnnouncements((error, announcements) => {
     if (error) {
       response.status(400).send(error);
     } else {
@@ -50,7 +49,7 @@ announcementRouter.post("/create", (request, response) => {
 });
 
 announcementRouter
-      .route("")
+  .route("")
   .get((request, response) => {
     announcementController.findAllAnnouncements(
       {
