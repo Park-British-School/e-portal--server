@@ -15,7 +15,7 @@ const announcementSchema = new Schema(
     visibility: {
       type: String,
       required: true,
-      enum: ["general", "class", "staff", "students", "admins"],
+      enum: ["general", "class", "teacher", "student", "admin"],
       default: "general",
     },
     createdBy: {

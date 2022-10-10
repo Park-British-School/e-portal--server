@@ -5,15 +5,8 @@ const generateStudentID = require("../middlewares/generateStudentID");
 
 const { studentController } = controllers;
 
-// router.get("/:studentID", getStudent);
-// router.get("/:studentID/notifications", getAllNotifications);
-// router.post("/:studentID/profile/edit", editProfile);
-// router.post("/addStudent", generateStudentID, addStudent);
-// router.post("/login", login);
-
-// router.get("/activate/:studentID", activate);
-// router.get("/deactivate/:studentID", deactivate);
-// router.get("/delete/:studentID", _delete);
+router.post("/addStudent", generateStudentID, studentController.addStudent);
+router.post("/login", studentController.login);
 
 router.get("/", studentController.findAllStudents);
 
@@ -93,5 +86,12 @@ router.get("/find-one", (request, response) => {
 router.get("/find", (request, response) => {
   studentController.findStudents();
 });
+
+router.get("/:studentID", studentController.getStudent);
+router.get("/:studentID/notifications", studentController.getAllNotifications);
+router.post("/:studentID/profile/edit", studentController.editProfile);
+router.get("/activate/:studentID", studentController.activate);
+router.get("/deactivate/:studentID", studentController.deactivate);
+router.get("/delete/:studentID", studentController._delete);
 
 module.exports = router;

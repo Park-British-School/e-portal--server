@@ -100,7 +100,7 @@ exports.signin = {
   },
 
   admin: async function (emailAddress, password, callback) {
-    adminController.findByID(emailAddress, (error, admin) => {
+    adminController.findAdminByEmailAddress(emailAddress, (error, admin) => {
       if (error) {
         callback(error, null);
       } else {
@@ -113,33 +113,28 @@ exports.signin = {
                   "This account has been banned, Please contact the administrator.",
                   null
                 );
-              }
-              if (admin.status === "suspended") {
-                callback(
-                  "This account has been suspended, Please contact the administrator.",
-                  null
-                );
               } else {
                 const accessToken = jsonwebtoken.sign(
-                  { id: admin.id, role: admin.role, subRole: admin.subRole },
+                  { id: admin._id, role: admin.role },
                   process.env.TOKEN_SECRET
                 );
-                adminController.updateAdminByID(
-                  admin.id,
-                  {
-                    $set: { lastSeen: new Date().getTime() },
-                  },
-                  (error) => {
-                    if (error) {
-                      callback(error, null);
-                    } else {
-                      callback(null, {
-                        accessToken: accessToken,
-                        ...admin._doc,
-                      });
-                    }
-                  }
-                );
+                callback(null, {
+                  accessToken: accessToken,
+                  ...admin._doc,
+                });
+                // adminController.updateAdminByID(
+                //   admin.id,
+                //   {
+                //     $set: { lastSeen: new Date().getTime() },
+                //   },
+                //   (error) => {
+                //     if (error) {
+                //       callback(error, null);
+                //     } else {
+                    
+                //     }
+                //   }
+                // );
               }
             } else {
               callback("Invalid email address or password", null);

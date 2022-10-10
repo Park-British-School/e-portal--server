@@ -6,10 +6,11 @@ const imageRouter = require("./image");
 const adminRouter = require("./admin");
 const termRouter = require("./term");
 const sessionRouter = require("./session");
-const invoiceRouter = require("./invoice"); // this is the new naming and import convention
+const invoiceRouter = require("./invoice");
 const feeRouter = require("./fee");
 const notificationRouter = require("./notification");
 const authRouter = require("./auth");
+const announcementRouter = require("./announcement");
 
 module.exports = {
   studentRouter,
@@ -24,4 +25,5 @@ module.exports = {
   feeRouter,
   notificationRouter,
   authRouter,
+  announcementRouter,
 };

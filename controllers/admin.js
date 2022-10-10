@@ -1,30 +1,32 @@
-const bcrypt = require('bcrypt')
-const mongoose = require('mongoose')
-const jsonwebtoken = require("jsonwebtoken")
-const Admin = require('../models/adminModel')
+const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
+const jsonwebtoken = require("jsonwebtoken");
+const Admin = require("../models/adminModel");
 
 exports.getAllAdmins = async function (req, res) {
-  const admins = await Admin.find({})
-  res.status(200).json(admins)
-}
+  const admins = await Admin.find({});
+  res.status(200).json(admins);
+};
 exports.getAdmin = async function (req, res) {
-  const admin = await Admin.findOne({ _id: req.params.id })
-  res.status(200).json(admin)
-}
+  const admin = await Admin.findOne({ _id: req.params.id });
+  res.status(200).json(admin);
+};
 exports.addAdmin = async function (req, res) {
   const salt = await bcrypt.genSalt(3);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const newAdmin = await new Admin({
     ...req.body,
-    password: hashedPassword
-  }).save()
-  res.status(200).json(newAdmin)
-}
+    password: hashedPassword,
+  }).save();
+  res.status(200).json(newAdmin);
+};
 
 exports.login = async function (req, res) {
   try {
     //CHECK IF THE ADMIN EXISTS
-    const admin = await Admin.findOne({ email: req.body.email }).populate('class')
+    const admin = await Admin.findOne({ email: req.body.email }).populate(
+      "class"
+    );
     if (admin) {
       //CHECK IF THE PASSWORD MATCHES
       const isPasswordMatched = await bcrypt.compare(
@@ -38,23 +40,29 @@ exports.login = async function (req, res) {
           process.env.TOKEN_SECRET
         );
         res.status(200).json({ authToken: token, ...admin._doc });
-      }
-      else {
+      } else {
         //THROW ERROR FOR INCORRECT PASSWORD
-        throw "Invalid Email or Password"
+        throw "Invalid Email or Password";
       }
-    }
-    else {
+    } else {
       //THROW ERROR FOR INVALID EMAIL ADDRESS
-      throw "Invalid Email or Password"
+      throw "Invalid Email or Password";
     }
-
-  }
-  catch (err) {
+  } catch (err) {
     res.status(400).json({
       error: {
-        message: err
-      }
-    })
+        message: err,
+      },
+    });
   }
-}
+};
+
+exports.findAdminByEmailAddress = async function (emailAddress, callback) {
+  Admin.findByEmailAddress(emailAddress, (error, document) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, document);
+    }
+  });
+};

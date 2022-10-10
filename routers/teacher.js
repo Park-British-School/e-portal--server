@@ -54,8 +54,8 @@ router.get("/find-one", (request, response) => {
         );
         break;
 
-      case "name":
-        teacherController.findTeacherByName(
+      case "emailAddress":
+        teacherController.findTeacherByEmailAddress(
           request.query.name,
           (error, teacher) => {
             if (error) {
@@ -70,7 +70,6 @@ router.get("/find-one", (request, response) => {
           }
         );
         break;
-
       default:
         response.status(400).send("Incorrect query parameters");
         break;

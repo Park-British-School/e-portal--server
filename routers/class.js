@@ -3,16 +3,12 @@ const controllers = require("../controllers");
 
 const { classController } = controllers;
 
-// router.get("/", getAllClasses)
-// router.get("/:classID", getClass)
-// router.post("/addClass", addClass)
-// router.post("/assignstudent", assignStudent)
-// router.post("/:classID/students/remove", removeStudent)
-// router.post("/assignteacher", assignTeacher)
-// router.post("/:classID/teachers/remove", removeTeacher)
-// router.post("/:classID/subjects/", getAllSubjects)
-// router.post("/:classID/subjects/add", addSubject)
-// router.post("/:classID/subjects/delete", deleteSubject)
+router.get("/", classController.getAllClasses);
+
+router.post("/addClass", classController.addClass);
+router.post("/assignstudent", classController.assignStudent);
+
+router.post("/assignteacher", classController.assignTeacher);
 
 // REFACTORING STARTS HERE
 
@@ -35,6 +31,13 @@ router.get("/find-all", (request, response) => {
     }
   });
 });
+
+router.get("/:classID", classController.getClass);
+router.post("/:classID/students/remove", classController.removeStudent);
+router.post("/:classID/teachers/remove", classController.removeTeacher);
+router.post("/:classID/subjects/", classController.getAllSubjects);
+router.post("/:classID/subjects/add", classController.addSubject);
+router.post("/:classID/subjects/delete", classController.deleteSubject);
 
 //REFACTORING ENDS HERE
 

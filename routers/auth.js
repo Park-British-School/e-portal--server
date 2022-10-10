@@ -36,11 +36,11 @@ authRouter.post("/sign-in/teacher", (request, response) => {
 });
 
 authRouter.post("/sign-in/admin", (request, response) => {
-  authController.admin.signin(
+  authController.signin.admin(
     request.body.emailAddress,
-    request.body.adminID,
     request.body.password,
     (error, data) => {
+      console.log(data)
       if (error) {
         response.status(400).send(error);
       } else {
