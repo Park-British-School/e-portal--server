@@ -230,7 +230,7 @@ exports.countAllClasses = async function (callback) {
   });
 };
 
-exports.findAllClasses = async function (callback) {
+exports.findAllClasses = async function (options, callback) {
   Class.findAll((error, document) => {
     if (error) {
       callback(error, null);
