@@ -3,56 +3,45 @@ const mongoose = require("mongoose");
 const jsonwebtoken = require("jsonwebtoken");
 const Admin = require("../models/adminModel");
 
-exports.getAllAdmins = async function (req, res) {
-  const admins = await Admin.find({});
-  res.status(200).json(admins);
-};
 exports.getAdmin = async function (req, res) {
   const admin = await Admin.findOne({ _id: req.params.id });
   res.status(200).json(admin);
 };
-exports.addAdmin = async function (req, res) {
+
+exports.createAdmin = async function (data, callback) {
   const salt = await bcrypt.genSalt(3);
-  const hashedPassword = await bcrypt.hash(req.body.password, salt);
-  const newAdmin = await new Admin({
-    ...req.body,
-    password: hashedPassword,
-  }).save();
-  res.status(200).json(newAdmin);
+  const hashedPassword = await bcrypt.hash(data.password, salt);
+  Admin.create({ ...data, password: hashedPassword })
+    .then((document) => {
+      callback(null, document);
+    })
+    .catch((error) => {
+      callback(error, null);
+    });
 };
 
-exports.login = async function (req, res) {
-  try {
-    //CHECK IF THE ADMIN EXISTS
-    const admin = await Admin.findOne({ email: req.body.email }).populate(
-      "class"
-    );
-    if (admin) {
-      //CHECK IF THE PASSWORD MATCHES
-      const isPasswordMatched = await bcrypt.compare(
-        req.body.password,
-        admin.password
-      );
-      if (isPasswordMatched) {
-        //SIGN THE ADMIN ID AND ROLE WITH JSONWEBTOKEN
-        const token = jsonwebtoken.sign(
-          { _id: admin._id, role: admin.role },
-          process.env.TOKEN_SECRET
-        );
-        res.status(200).json({ authToken: token, ...admin._doc });
+exports.findAllAdmins = async function (options, callback) {
+  if (options.paginate) {
+    Admin.find()
+      .sort({
+        firstName: "asc",
+      })
+      .limit(options.count)
+      .skip(options.count * (options.page - 1))
+      .exec(function (error, admins) {
+        if (error) {
+          callback(error, null);
+        } else {
+          callback(null, admins);
+        }
+      });
+  } else {
+    Admin.findAll((error, documents) => {
+      if (error) {
+        callback(error, null);
       } else {
-        //THROW ERROR FOR INCORRECT PASSWORD
-        throw "Invalid Email or Password";
+        callback(null, documents);
       }
-    } else {
-      //THROW ERROR FOR INVALID EMAIL ADDRESS
-      throw "Invalid Email or Password";
-    }
-  } catch (err) {
-    res.status(400).json({
-      error: {
-        message: err,
-      },
     });
   }
 };
