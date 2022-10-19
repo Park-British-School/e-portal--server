@@ -188,7 +188,7 @@ exports.countAllTeachers = async function (callback) {
   });
 };
 
-exports.findAllTeachers = async function (callback) {
+exports.findAllTeachers = async function (options, callback) {
   Teacher.findAll((error, document) => {
     if (error) {
       callback(error, null);
