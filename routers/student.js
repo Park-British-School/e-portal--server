@@ -1,14 +1,10 @@
 const router = require("express").Router();
 const multer = require("multer");
 const controllers = require("../controllers");
-const generateStudentID = require("../middlewares/generateStudentID");
+const middlewares = require("../middlewares");
 
 const { studentController } = controllers;
-
-router.post("/addStudent", generateStudentID, studentController.addStudent);
-router.post("/login", studentController.login);
-
-router.get("/", studentController.findAllStudents);
+const { generateStudentID } = middlewares;
 
 router.get("/count-all", (request, response) => {
   studentController.countAllStudents((error, count) => {
@@ -83,8 +79,14 @@ router.get("/find-one", (request, response) => {
   }
 });
 
-router.get("/find", (request, response) => {
-  studentController.findStudents();
+router.post("/create", generateStudentID, (request, response) => {
+  studentController.createStudent({ ...request.body }, (error, student) => {
+    if (error) {
+      response.status(400).send(error);
+    } else {
+      response.status(200).json(student);
+    }
+  });
 });
 
 router.get("/:studentID", studentController.getStudent);
