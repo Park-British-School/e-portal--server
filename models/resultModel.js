@@ -79,13 +79,19 @@ const resultSchema = mongoose.Schema({
 });
 
 resultSchema.static("findAll", function (callback) {
-  return this.find({}, (error, documents) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      callback(null, documents);
-    }
-  });
+  return this.find()
+    .populate([
+      { path: "class", select: "-image -password" },
+      { path: "student", select: "-image -password" },
+      { path: "uploadedBy", select: "-image -password" },
+    ])
+    .exec((error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents);
+      }
+    });
 });
 
 resultSchema.static("findByID", function (ID, callback) {
