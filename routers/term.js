@@ -1,10 +1,13 @@
-const router = require("express").Router();
+const express = require("express");
 const controllers = require("../controllers");
 
 const { termController } = controllers;
+const { Router } = express;
 
-router.get("/", termController.getTerm);
+termRouter = Router();
 
-router.post("/set", termController.setTerm);
+termRouter.get("/", termController.getTerm);
 
-module.exports = router;
+termRouter.post("/set", termController.setTerm);
+
+module.exports = termRouter;

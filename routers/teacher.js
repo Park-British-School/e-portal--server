@@ -25,7 +25,7 @@ router.get("/count-all", (request, response) => {
 });
 
 router.get("/find-all", (request, response) => {
-  teacherController.findAllTeachers((error, teachers) => {
+  teacherController.findAllTeachers({}, (error, teachers) => {
     if (error) {
       response.status(400).send(error);
     } else {
