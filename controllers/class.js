@@ -231,6 +231,18 @@ exports.countAllClasses = async function (callback) {
 };
 
 exports.findAllClasses = async function (options, callback) {
+  if (options.paginate) {
+    Class.find()
+      .limit(options.count)
+      .skip(options.count * (options.page - 1))
+      .exec((error, classes) => {
+        if (error) {
+          callback(error, null);
+        } else {
+          callback(null, classes);
+        }
+      });
+  }
   Class.findAll((error, document) => {
     if (error) {
       callback(error, null);
@@ -238,6 +250,40 @@ exports.findAllClasses = async function (options, callback) {
       callback(null, document);
     }
   });
+};
+
+exports.findClassByID = async function (ID, callback) {
+  Class.find({ _id: ID })
+    .populate(["students", "teachers"])
+    .exec((error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents[0]);
+      }
+    });
+};
+
+exports.findClassByName = async function (name, callback) {
+  Class.find({ name: name })
+    .populate(["students", "teachers"])
+    .exec((error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents[0]);
+      }
+    });
+};
+
+exports.createClass = async function (data, callback) {
+  Class.create({ ...data })
+    .then((document) => {
+      callback(null, document);
+    })
+    .catch((error) => {
+      callback(error, null);
+    });
 };
 
 //REFACTORING ENDS HERE
