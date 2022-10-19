@@ -57,6 +57,12 @@ const studentSchema = new mongoose.Schema(
         ref: "Result",
       },
     ],
+    invoices: [
+      {
+        type: String,
+        ref: "Invoice",
+      },
+    ],
     status: {
       type: String,
       default: "active",
@@ -85,7 +91,9 @@ studentSchema.static("findAll", function (callback) {
 });
 
 studentSchema.static("findByID", function (ID, callback) {
-  return this.find({ _id: ID }, (error, documents) => {
+  return this.find({ _id: ID })
+  .populate(["results", "invoices"])
+  .exec((error, documents) => {
     if (error) {
       callback(error, null);
     } else {
@@ -95,7 +103,7 @@ studentSchema.static("findByID", function (ID, callback) {
         callback(null, documents[0]);
       }
     }
-  });
+  })
 });
 
 studentSchema.static("findByName", function (name, callback) {
