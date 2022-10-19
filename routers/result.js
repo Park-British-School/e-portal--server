@@ -82,9 +82,9 @@ router.post("/upload", aggregateScores, (request, response) => {
 });
 // REFACTORING ENDS HERE
 
-// router.get("/:id", getResult);
+router.get("/:id", resultController.getResult);
 // router.get("/class/:classID", getResultsByClass);
-// router.post("/", aggregateScores, addResult);
+router.post("/", aggregateScores, resultController.addResult);
 // router.post("/:resultID/edit", editResult);
 // router.get("/:resultID/approve", approveResult);
 // router.get("/:resultID/download", downloadResult, generateResultPDF);
