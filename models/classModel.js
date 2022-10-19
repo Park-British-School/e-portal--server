@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
-const classSchema = new mongoose.Schema({
+
+const { Schema, model } = mongoose;
+
+const classSchema = new Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   teachers: [
     {
@@ -35,6 +39,6 @@ classSchema.static("findAll", function (callback) {
 });
 //REFACTORING ENDS HERE
 
-const Class = mongoose.model("Class", classSchema);
+const Class = model("Class", classSchema);
 
 module.exports = Class;
