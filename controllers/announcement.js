@@ -1,5 +1,5 @@
 const models = require("../models");
-const classController = require("./class")
+const classController = require("./class");
 
 const { announcementModel } = models;
 
@@ -35,11 +35,6 @@ exports.findAnnouncements = async function (options, callback) {
 };
 
 exports.createAnnouncement = async function (data, options, callback) {
-  if(options.visibility === "class"){
-    classController.findClassByID(
-      data.class
-    )
-  }
   announcementModel({ ...options })
     .create({ ...data })
     .then((document) => {
