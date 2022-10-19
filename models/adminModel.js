@@ -36,8 +36,17 @@ const adminSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
   },
+});
+
+adminSchema.static("findAll", function (callback) {
+  return this.find().exec((error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents);
+    }
+  });
 });
 
 adminSchema.static("findByEmailAddress", function (email, callback) {
