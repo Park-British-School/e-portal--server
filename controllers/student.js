@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
 const jsonwebtoken = require("jsonwebtoken");
+const classController = require("./class");
 
 const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
@@ -66,52 +67,6 @@ exports.addStudent = async function (req, res) {
     }
     res.status(200).json(newStudent);
   } catch (err) {
-    res.status(400).json({
-      error: {
-        message: err,
-      },
-    });
-  }
-};
-
-exports.login = async function (req, res) {
-  try {
-    //CHECK IF THE STUDENT EXISTS
-    const student = await Student.findOne({ _id: req.body.id }).populate([
-      "class",
-      "results",
-    ]);
-    if (student) {
-      //CHECK IF THE PASSWORD MATCHES
-      const isPasswordMatched = await bcrypt.compare(
-        req.body.password,
-        student.password
-      );
-      if (isPasswordMatched) {
-        //SIGN THE STUDENT ID AND ROLE WITH JSONWEBTOKEN
-        const token = jsonwebtoken.sign(
-          { _id: student._id, role: "student" },
-          process.env.TOKEN_SECRET
-        );
-        //CHECK IF THE STUDENT ACCOUNT IS ACTIVE
-        const isActive = student.status === "active";
-        if (isActive) {
-          await Student.updateOne(
-            { _id: student._id },
-            { lastSeen: new Date().getTime() }
-          );
-          res.status(200).json({ authToken: token, ...student._doc });
-        } else {
-          throw "This account has been deactivated, Please contact an administrator";
-        }
-      } else {
-        throw "Invalid ID or Password";
-      }
-    } else {
-      throw "Invalid ID or Password";
-    }
-  } catch (err) {
-    console.log(err);
     res.status(400).json({
       error: {
         message: err,
@@ -206,21 +161,6 @@ exports.editProfile = async (req, res) => {
   }
 };
 
-exports.getStudents = async function (req, res) {
-  try {
-    const studentID = req.body.studentID;
-    const students = req.body
-      .find({ id: studentID })
-      .populate(["class", "results"]);
-  } catch (error) {
-    res.status(400).json({
-      error: {
-        message: error,
-      },
-    });
-  }
-};
-
 exports.getAllNotifications = async function (request, response) {
   const studentID = request.params.studentID.replace(/-/g, "/");
   notificationModel().find({ recipient: studentID }, (error, documents) => {
@@ -284,6 +224,39 @@ exports.findStudentByName = async function (name, callback) {
   });
 };
 
-exports.findStudents = async function (options, callback) {};
+exports.createStudent = async function (data, callback) {
+  const salt = await bcrypt.genSalt(3);
+  const hashedPassword = await bcrypt.hash(data.password, salt);
+  Student.create({ ...data, password: hashedPassword })
+    .then((document) => {
+      if (data.class) {
+        Class.updateOne(
+          { _id: data.class },
+          { $push: { students: document._id } },
+          (error, documents) => {
+            console.log(error);
+          }
+        );
+      }
+      if (data.image) {
+        fs.writeFile(
+          `${__dirname}/../uploads/images/profile/${document._id
+            .toString()
+            .replace(/\//g, "-")}.jpg`,
+          data.image,
+          "base64",
+          (error) => {
+            if (error) {
+              console.log(error);
+            }
+          }
+        );
+      }
+      callback(null, document);
+    })
+    .catch((error) => {
+      callback(error.message, null);
+    });
+};
 
 //REFACTORING ENDS HERE
