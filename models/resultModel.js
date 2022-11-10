@@ -58,11 +58,6 @@ const resultSchema = mongoose.Schema({
     type: Date,
     default: () => new Date().getTime(),
   },
-  uploadedBy: {
-    type: mongoose.Types.ObjectId,
-    required: true,
-    ref: "Teacher",
-  },
   isApproved: {
     type: Boolean,
     required: true,

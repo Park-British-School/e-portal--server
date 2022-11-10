@@ -228,12 +228,81 @@ exports.findTeacherByEmailAddress = async function (email, callback) {
   });
 };
 
+exports.createTeacher = async function (data, callback) {
+  const salt = await bcrypt.genSalt(3);
+  const hashedPassword = await bcrypt.hash(data.password, salt);
+  Teacher.create({ ...data, password: hashedPassword })
+    .then((document) => {
+      if (data.class && data.class.length > 0) {
+        Class.updateOne(
+          { _id: data.class },
+          { $push: { teachers: document._id } },
+          (error, documents) => {
+            if (error) {
+              console.log(error);
+            }
+          }
+        );
+      }
+      if (data.image) {
+        fs.writeFile(
+          `${__dirname}/../uploads/images/profile/${document._id
+            .toString()
+            .replace(/\//g, "-")}.jpg`,
+          data.image,
+          "base64",
+          (error) => {
+            if (error) {
+              console.log(error);
+            }
+          }
+        );
+      }
+      callback(null, document);
+    })
+    .catch((error) => {
+      if (error) {
+        callback(error, null);
+      }
+    });
+};
+
 exports.updateTeacherByID = async function (ID, update, callback) {
   Teacher.updateOne({ _id: ID }, { ...update }, (error) => {
     if (error) {
       callback(error);
     } else {
       callback(null);
+    }
+  });
+};
+
+exports.deleteTeacherByID = async function (ID, callback) {
+  Teacher.deleteOne({ _id: ID }, (error) => {
+    if (error) {
+      callback(error);
+    } else {
+      Class.find()
+        .where("teachers")
+        .in(ID)
+        .exec((error, classes) => {
+          if (error) {
+            console.log(error);
+          } else {
+            classes.forEach((_class, index) => {
+              Class.updateOne(
+                { _id: _class._id },
+                { $pull: { teachers: ID } },
+                (error) => {
+                  if (error) {
+                    console.log(error);
+                  }
+                }
+              );
+            });
+            callback(null);
+          }
+        });
     }
   });
 };

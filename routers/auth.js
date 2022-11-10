@@ -40,7 +40,7 @@ authRouter.post("/sign-in/admin", (request, response) => {
     request.body.emailAddress,
     request.body.password,
     (error, data) => {
-      console.log(data)
+      console.log(data);
       if (error) {
         response.status(400).send(error);
       } else {

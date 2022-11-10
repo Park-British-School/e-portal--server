@@ -79,10 +79,109 @@ router.get("/find-one", (request, response) => {
   }
 });
 
-router.get("/:classID", classController.getClass);
-router.post("/:classID/students/remove", classController.removeStudent);
-router.post("/:classID/teachers/remove", classController.removeTeacher);
-router.post("/:classID/subjects/", classController.getAllSubjects);
+// router.get("/update-one", (request, response) => {
+//   if (request.query.by) {
+//     switch (request.query.by) {
+//       case "ID":
+//         classController.updateClassByID(request.query.ID, {
+//           action: request.query.action,
+//         });
+//         break;
+//       case "name":
+//         classController.updateClassByName;
+//         break;
+//       default:
+//         response.status(400).send("Incorrect query parameters");
+//     }
+//   } else {
+//     response.status(400).send("Incorrect query parameters");
+//   }
+// });
+
+router.get("/:classID/students/assign", (request, response) => {
+  classController.students.assign(
+    request.params.classID,
+    request.query.studentID,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:classID/students/deassign", (request, response) => {
+  classController.students.deassign(
+    request.params.classID,
+    request.query.studentID,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:classID/teachers/assign", (request, response) => {
+  classController.teachers.assign(
+    request.params.classID,
+    request.query.emailAddress,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:classID/teachers/deassign", (request, response) => {
+  classController.teachers.deassign(
+    request.params.classID,
+    request.query.teacherID,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:classID/subjects/add", (request, response) => {
+  classController.subjects.add(
+    request.params.classID,
+    request.query.subject,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:classID/subjects/remove", (request, response) => {
+  classController.subjects.remove(
+    request.params.classID,
+    request.query.subject,
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
 router.post("/:classID/subjects/add", classController.addSubject);
 router.post("/:classID/subjects/delete", classController.deleteSubject);
 

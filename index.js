@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
 const routers = require("./routers");
+const models = require("./models");
 
 mongoose.connect(process.env.MONGOURI, {
   useNewUrlParser: true,
@@ -26,6 +27,8 @@ const {
   authRouter,
   announcementRouter,
 } = routers;
+
+const { invoiceModel } = models;
 
 const server = express();
 server.use(express.json({ limit: "50mb" }));
@@ -50,6 +53,8 @@ server.get("/ping", (request, response) => {
   console.log("PING!!!");
   response.status(200).end();
 });
+
+invoiceModel();
 
 server.listen(process.env.PORT, () => {
   console.log(`server started at port ${process.env.PORT}`);

@@ -2,10 +2,8 @@ const router = require("express").Router();
 const controllers = require("../controllers");
 const middlewares = require("../middlewares");
 
-const generateResultPDF = require("../middlewares/generateResultPDF");
-
 const { resultController } = controllers;
-const { aggregateScores } = middlewares;
+const { aggregateScores, generateResultPDF } = middlewares;
 
 // TO BE REMOVED AFTER STABLE
 router.get("/", resultController.getAllResults);
@@ -16,7 +14,7 @@ router.get("/find-all", (request, response) => {
   resultController.findAllResults(
     {
       paginate: request.query.paginate === "true" ? true : false,
-      count: request.query.count ? parseInt(request.query.count) : 10,
+      count: request.query.count ? parseInt(request.query.count) : 20,
       page: request.query.page ? parseInt(request.query.page) : 1,
     },
     (error, results) => {
@@ -83,11 +81,35 @@ router.post("/upload", aggregateScores, (request, response) => {
 // REFACTORING ENDS HERE
 
 router.get("/:id", resultController.getResult);
-// router.get("/class/:classID", getResultsByClass);
+
 router.post("/", aggregateScores, resultController.addResult);
-// router.post("/:resultID/edit", editResult);
-// router.get("/:resultID/approve", approveResult);
-// router.get("/:resultID/download", downloadResult, generateResultPDF);
-// router.get("/delete/:resultID", deleteResult);
+router.post("/:resultID/edit", resultController.editResult);
+router.get("/:resultID/approve", (request, response) => {
+  resultController.approveResult(request.params.resultID, (error) => {
+    if (error) {
+      response.status(400).send(error);
+    } else {
+      response.status(200).end();
+    }
+  });
+});
+
+router.get(
+  "/:resultID/download",
+  resultController.downloadResult,
+  generateResultPDF
+);
+
+router.get("/:resultID/delete", (request, response) => {
+  resultController.deleteResult(request.params.resultID, (error) => {
+    if (error) {
+      response.status(400).send(error);
+    } else {
+      response.status(200).end();
+    }
+  });
+});
+
+// router.get("/class/:classID", getResultsByClass);
 
 module.exports = router;

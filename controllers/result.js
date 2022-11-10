@@ -63,23 +63,6 @@ exports.addResult = async function (req, res) {
   }
 };
 
-exports.deleteResult = async function (req, res) {
-  const resultID = req.params.resultID;
-  try {
-    const result = await Result.findByIdAndDelete(resultID);
-    await Student.updateOne(
-      { _id: result.student },
-      { $pull: { results: result._id } }
-    );
-  } catch (error) {
-    res.status(400).json({
-      error: {
-        message: error,
-      },
-    });
-  }
-};
-
 exports.editResult = async function (req, res) {
   try {
     const resultID = req.params.resultID;
@@ -88,22 +71,6 @@ exports.editResult = async function (req, res) {
       { ...req.body, isApproved: false }
     );
 
-    res.status(200).json({});
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      error: {
-        message: err,
-      },
-    });
-  }
-};
-
-exports.approveResult = async function (req, res) {
-  try {
-    const resultID = req.params.resultID;
-    console.log(resultID);
-    await Result.updateOne({ _id: resultID }, { isApproved: true });
     res.status(200).json({});
   } catch (err) {
     console.log(err);
@@ -152,9 +119,6 @@ exports.countAllResults = function (callback) {
 exports.findAllResults = async function (options, callback) {
   if (options.paginate) {
     Result.find()
-      .sort({
-        firstName: "asc",
-      })
       .populate([
         { path: "class", select: "-image -password" },
         { path: "student", select: "-image -password" },
@@ -220,6 +184,51 @@ exports.uploadResult = async function (data, callback) {
       callback(
         "This student does not exist!, Please check the ID and try again"
       );
+    }
+  });
+};
+
+exports.approveResult = async function (resultID, callback) {
+  Result.updateOne(
+    { _id: resultID },
+    { $set: { isApproved: true } },
+    (error) => {
+      if (error) {
+        callback(error);
+      } else {
+        callback(null);
+      }
+    }
+  );
+};
+
+exports.deleteResult = async function (resultID, callback) {
+  Result.deleteOne({ _id: resultID }, (error) => {
+    if (error) {
+      callback(error);
+    } else {
+      Student.find()
+        .where("results")
+        .in(resultID)
+        .exec((error, students) => {
+          console.log(students);
+          if (error) {
+            console.log(error);
+          } else {
+            students.forEach((student, index) => {
+              Student.updateOne(
+                { _id: student._id },
+                { $pull: { results: resultID } },
+                (error) => {
+                  if (error) {
+                    console.log(error);
+                  }
+                }
+              );
+            });
+            callback(null);
+          }
+        });
     }
   });
 };

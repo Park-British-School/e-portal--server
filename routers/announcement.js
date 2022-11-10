@@ -48,49 +48,28 @@ announcementRouter.post("/create", (request, response) => {
   );
 });
 
-announcementRouter
-  .route("")
-  .get((request, response) => {
-    announcementController.findAllAnnouncements(
-      {
-        visibility: request.body.visibility || "general",
-      },
-      (error, announcements) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).json(announcements);
-        }
-      }
-    );
-  })
-  .post();
-
-announcementRouter
-  .route("/:announcementID")
-  .get((request, response) => {
-    announcementController.findAnnouncementByID(
-      request.params.announcementID,
-      (error, announcement) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).json(announcement);
-        }
-      }
-    );
-  })
-  .delete((request, response) => {
-    announcementController.deleteAnnouncementByID(
-      request.params.announcementID,
-      (error) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).end();
-        }
-      }
-    );
+announcementRouter.get("/delete-one", (request, response) => {
+  announcementController.deleteAnnouncementByID(request.query.ID, (error) => {
+    if (error) {
+      response.status(400).send(error);
+    } else {
+      response.status(200).end();
+    }
   });
+});
+
+announcementRouter.get("/update-one", (request, response) => {
+  announcementController.updateAnnouncementByID(
+    request.query.ID,
+    { action: request.query.action || null },
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
 
 module.exports = announcementRouter;

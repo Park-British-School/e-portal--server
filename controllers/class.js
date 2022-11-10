@@ -286,4 +286,192 @@ exports.createClass = async function (data, callback) {
     });
 };
 
+exports.students = {
+  assign(classID, studentID, callback) {
+    Student.findById(studentID, (error, student) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (student) {
+          Class.findById(classID, (error, _class) => {
+            if (_class) {
+              if (_class.students.indexOf(studentID) < 0) {
+                Class.updateOne(
+                  { _id: classID },
+                  { $push: { students: studentID } },
+                  (error) => {
+                    if (error) {
+                      callback(error);
+                    } else {
+                      callback(null);
+                    }
+                  }
+                );
+              } else {
+                callback(`Cannot assign a student twice!`);
+              }
+            } else {
+              callback("Class does not exist!");
+            }
+          });
+        } else {
+          callback("Student does not exist!");
+        }
+      }
+    });
+  },
+  deassign(classID, studentID, callback) {
+    Student.findById(studentID, (error, student) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (student) {
+          Class.findById(classID, (error, _class) => {
+            if (_class) {
+              if (_class.students.indexOf(studentID) >= 0) {
+                Class.updateOne(
+                  { _id: classID },
+                  { $pull: { students: studentID } },
+                  (error) => {
+                    if (error) {
+                      callback(error);
+                    } else {
+                      callback(null);
+                    }
+                  }
+                );
+              } else {
+                callback(`Student does not exist in this class`);
+              }
+            } else {
+              callback("Class does not exist!");
+            }
+          });
+        } else {
+          callback("Student does not exist!");
+        }
+      }
+    });
+  },
+};
+
+exports.teachers = {
+  assign(classID, emailAddress, callback) {
+    console.log(emailAddress)
+    Teacher.findOne({ email: emailAddress }, (error, teacher) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (teacher) {
+          Class.findById(classID, (error, _class) => {
+            if (_class) {
+              if (_class.teachers.indexOf(teacher._id) < 0) {
+                Class.updateOne(
+                  { _id: classID },
+                  { $push: { teachers: teacher._id } },
+                  (error) => {
+                    if (error) {
+                      callback(error);
+                    } else {
+                      callback(null);
+                    }
+                  }
+                );
+              } else {
+                callback(`Cannot assign a teacher twice!`);
+              }
+            } else {
+              callback("Class does not exist!");
+            }
+          });
+        } else {
+          callback("teacher does not exist!");
+        }
+      }
+    });
+  },
+  deassign(classID, teacherID, callback) {
+    Teacher.findById(teacherID, (error, teacher) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (teacher) {
+          Class.findById(classID, (error, _class) => {
+            if (_class) {
+              if (_class.teachers.indexOf(teacherID) >= 0) {
+                Class.updateOne(
+                  { _id: classID },
+                  { $pull: { teachers: teacherID } },
+                  (error) => {
+                    if (error) {
+                      callback(error);
+                    } else {
+                      callback(null);
+                    }
+                  }
+                );
+              } else {
+                callback(`Teacher does not exist in this class`);
+              }
+            } else {
+              callback("Class does not exist!");
+            }
+          });
+        } else {
+          callback("Teacher does not exist!");
+        }
+      }
+    });
+  },
+};
+
+exports.subjects = {
+  add(classID, subject, callback) {
+    Class.findById(classID, (error, _class) => {
+      if (_class) {
+        if (_class.subjects.indexOf(subject) < 0) {
+          Class.updateOne(
+            { _id: classID },
+            { $push: { subjects: subject } },
+            (error) => {
+              if (error) {
+                callback(error);
+              } else {
+                callback(null);
+              }
+            }
+          );
+        } else {
+          callback(`Cannot add a subject twice!`);
+        }
+      } else {
+        callback("Class does not exist!");
+      }
+    });
+  },
+  remove(classID, subject, callback) {
+    Class.findById(classID, (error, _class) => {
+      if (_class) {
+        if (_class.subjects.indexOf(subject) >= 0) {
+          Class.updateOne(
+            { _id: classID },
+            { $pull: { subjects: subject } },
+            (error) => {
+              if (error) {
+                callback(error);
+              } else {
+                callback(null);
+              }
+            }
+          );
+        } else {
+          callback(`Subject does not exist in this class`);
+        }
+      } else {
+        callback("Class does not exist!");
+      }
+    });
+  },
+};
+
 //REFACTORING ENDS HERE

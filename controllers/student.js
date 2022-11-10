@@ -10,7 +10,7 @@ const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
 const Result = require("../models/resultModel");
 
-const { notificationModel } = models;
+const { notificationModel, invoiceModel } = models;
 
 exports.findAllStudents = async function (req, res) {
   const student = await Student.find({}).populate("class");
@@ -257,6 +257,92 @@ exports.createStudent = async function (data, callback) {
     .catch((error) => {
       callback(error.message, null);
     });
+};
+
+exports.updateStudentByID = async function (studentID, data, callback) {
+  Student.updateOne(
+    { _id: studentID },
+    { $set: { ...data } },
+    (error, data) => {
+      if (error) {
+        callback(error.message);
+      } else {
+        callback(null);
+      }
+    }
+  );
+};
+
+exports.deleteStudentByID = async function (studentID, callback) {
+  Student.deleteOne({ _id: studentID }, (error) => {
+    if (error) {
+      callback(error);
+    } else {
+      Result.find()
+        .where("student")
+        .equals(studentID)
+        .exec((error, results) => {
+          if (error) {
+            callback(error);
+          } else {
+            results.forEach((result, index) => {
+              Result.deleteOne({ _id: result._id }, (error) => {
+                if (error) {
+                  console.log(error);
+                }
+              });
+            });
+          }
+        });
+      Class.find()
+        .where("students")
+        .in(studentID)
+        .exec((error, classes) => {
+          if (error) {
+            console.log(error);
+          } else {
+            classes.forEach((_class, index) => {
+              Class.updateOne(
+                { _id: _class._id },
+                { $pull: { students: studentID } }
+              );
+            });
+          }
+        });
+    }
+  });
+};
+
+exports.results = {
+  findAll(studentID, callback) {
+    Student.findByID(studentID, (error, document) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        if (document) {
+          callback(null, document.results);
+        } else {
+          callback("Student not found!", null);
+        }
+      }
+    });
+  },
+};
+
+exports.invoices = {
+  findAll() {
+    Student.findByID(studentID, (error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        if (document) {
+          callback(null, document.invoices);
+        } else {
+          callback("Student not found!", null);
+        }
+      }
+    });
+  },
 };
 
 //REFACTORING ENDS HERE

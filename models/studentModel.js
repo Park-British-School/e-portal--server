@@ -25,12 +25,10 @@ const studentSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       trim: true,
-      required: true,
     },
     phoneNumber: {
       type: String,
       trim: true,
-      required: true,
     },
     gender: {
       type: String,
@@ -92,18 +90,18 @@ studentSchema.static("findAll", function (callback) {
 
 studentSchema.static("findByID", function (ID, callback) {
   return this.find({ _id: ID })
-  .populate(["results", "invoices"])
-  .exec((error, documents) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      if (documents.length === 0) {
-        callback(null, null);
+    .populate(["results", "invoices"])
+    .exec((error, documents) => {
+      if (error) {
+        callback(error, null);
       } else {
-        callback(null, documents[0]);
+        if (documents.length === 0) {
+          callback(null, null);
+        } else {
+          callback(null, documents[0]);
+        }
       }
-    }
-  })
+    });
 });
 
 studentSchema.static("findByName", function (name, callback) {

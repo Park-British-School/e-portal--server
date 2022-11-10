@@ -71,7 +71,7 @@ router.get("/find-one", (request, response) => {
         break;
 
       default:
-        response.status(400).send("Incorrect query parameters");
+        response.status(400).send("Incorrect query parameters.");
         break;
     }
   } else {
@@ -90,6 +90,80 @@ router.post("/create", generateStudentID, (request, response) => {
 });
 
 router.get("/:studentID", studentController.getStudent);
+
+router.get("/:studentID/results", (request, response) => {
+  studentController.results.findAll(
+    request.params.studentID.replace(/-/g, "/"),
+    (error, results) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).json(results);
+      }
+    }
+  );
+});
+
+router.get("/:studentID/invoices", (request, response) => {
+  studentController.invoices.findAll(
+    request.params.studentID.replace(/-/g, "/"),
+    (error, invoices) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).json(invoices);
+      }
+    }
+  );
+});
+
+router.post("/:studentID/update", (request, response) => {
+  studentController.findStudentByID(
+    request.params.studentID.replace(/-/g, "/"),
+    (error, student) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        if (student) {
+          studentController.updateStudentByID(
+            student._id,
+            { ...request.body },
+            (error) => {
+              if (error) {
+                response.status(400).send(error);
+              } else {
+                response.status(200).end();
+              }
+            }
+          );
+        } else {
+          response.status(400).send("Student does not exist");
+        }
+      }
+    }
+  );
+});
+
+router.get("/:studentID/delete", (request, response) => {
+  studentController.deleteStudentByID(
+    request.params.studentID.replace(/-/g, "/"),
+    (error) => {
+      if (error) {
+        response.status(400).send(error);
+      } else {
+        response.status(200).end();
+      }
+    }
+  );
+});
+
+router.get("/:studentID/notifications", (request, response) => {
+  studentController.notifications.findAll(
+    request.params.studentID.replace(/-/g, "/"),
+    (error, notifications) => {}
+  );
+});
+
 router.get("/:studentID/notifications", studentController.getAllNotifications);
 router.post("/:studentID/profile/edit", studentController.editProfile);
 router.get("/activate/:studentID", studentController.activate);

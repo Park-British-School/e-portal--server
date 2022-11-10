@@ -12,7 +12,7 @@ const announcementSchema = new Schema(
       type: String,
       required: true,
     },
-    visibility: {
+    privacy: {
       type: String,
       required: true,
       enum: ["general", "class", "teacher", "student", "admin"],
@@ -25,6 +25,10 @@ const announcementSchema = new Schema(
       role: {
         type: String,
       },
+    },
+    isHidden: {
+      type: String,
+      default: false,
     },
     createdAt: {
       type: Date,
@@ -47,7 +51,7 @@ announcementSchema.static("findAll", function (options, callback) {
     } else {
       callback(null, documents);
     }
-  }).populate(["populatedFields.createdBy", "populatedFields.class"]);
+  });
 });
 
 Array(["Staff", "Student", "Admin"]).forEach((item) => {

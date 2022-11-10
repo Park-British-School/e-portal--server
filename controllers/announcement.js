@@ -64,3 +64,40 @@ exports.deleteAnnouncementByID = async function (announcementID, callback) {
     }
   });
 };
+
+exports.updateAnnouncementByID = async function (
+  announcementID,
+  options,
+  callback
+) {
+  switch (options.action) {
+    case "hide":
+      announcementModel().updateOne(
+        { _id: announcementID },
+        { $set: { isHidden: true } },
+        (error) => {
+          if (error) {
+            callback(error);
+          } else {
+            callback(null);
+          }
+        }
+      );
+      break;
+    case "unhide":
+      announcementModel().updateOne(
+        { _id: announcementID },
+        { $set: { isHidden: false } },
+        (error) => {
+          if (error) {
+            callback(error);
+          } else {
+            callback(null);
+          }
+        }
+      );
+      break;
+    default:
+      callback("Invalid action!");
+  }
+};
