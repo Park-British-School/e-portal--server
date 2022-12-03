@@ -1,0 +1,99 @@
+@baseURL = http://localhost:3065
+
+###
+# @name FIND_ALL_INVOICES
+GET {{baseURL}}/invoices/find-all
+
+###
+# @name COUNT_ALL_INVOICES
+GET {{baseURL}}/invoices/count-all
+
+###
+# @name FIND_INVOICE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/find-one?by=ID&ID={{invoiceID}}
+
+###
+# @name CREATE_INVOICE
+# @prompt studentID
+POST {{baseURL}}/invoices/create
+Content-Type : application/json
+
+{
+  "fees":[{
+    "title": "fee1",
+    "subTitle": "fee1 subtitle",
+    "amount": 5000
+  }],
+  "issuedTo": "dwdwd3d3d3d3d3d"
+}
+
+###
+# @name UPDATE_INVOICE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/{{invoiceID}}/update
+
+###
+# @name DELETE_INVOICE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/{{invoiceID}}/delete
+
+###
+# @name FIND_ALL_TEMPLATES
+GET {{baseURL}}/invoices/templates/find-all
+
+###
+# @name COUNT_ALL_TEMPLATES
+GET {{baseURL}}/invoices/templates/count-all
+
+###
+# @name FIND_TEMPLATE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/templates/find-one?by=ID&ID={{invoiceID}}
+
+###
+# @name CREATE_TEMPLATE
+POST {{baseURL}}/invoices/templates/create
+Content-Type: application/json
+{
+  "fees":[{
+    "title": "fee1",
+    "subTitle": "fee1 subtitle",
+    "amount": 5000
+  }],
+  "title": "template three"
+}
+
+###
+# @name UPDATE_TEMPLATE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/templates/{{invoiceID}}/update
+
+###
+# @name DELETE_TEMPLATE_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/templates/{{invoiceID}}/delete
+
+###
+# @name GET_ALL_DRAFTS
+GET {{baseURL}}/invoices/drafts/find-all
+
+###
+# @name COUNT_ALL_DRAFTS
+GET {{baseURL}}/invoices/drafts/count-all 
+
+###
+# @name FIND_DRAFT_BY_ID
+# @prompt invoiceID
+GET {{baseURL}}/invoices/drafts/find-one?by=ID&ID={{invoiceID}}
+
+###
+# @name CREATE_DRAFT
+# @prompt student
+POST {{baseURL}}/invoices/drafts/create
+Content-Type: application/json
+
+{
+
+}
+

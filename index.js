@@ -54,8 +54,6 @@ server.get("/ping", (request, response) => {
   response.status(200).end();
 });
 
-invoiceModel();
-
 server.listen(process.env.PORT, () => {
   console.log(`server started at port ${process.env.PORT}`);
 });

@@ -204,6 +204,16 @@ exports.findAllStudents = async function (options, callback) {
   }
 };
 
+exports.search = async function (search, callback) {
+  Student.findBySearch(search, (error, documents) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, documents);
+    }
+  });
+};
+
 exports.findStudentByID = async function (studentID, callback) {
   Student.findByID(studentID, (error, document) => {
     if (error) {

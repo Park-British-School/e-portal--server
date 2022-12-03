@@ -33,6 +33,16 @@ router.get("/find-all", (request, response) => {
   );
 });
 
+router.post("/search", (request, response) => {
+  studentController.search(request.body.search, (error, students) => {
+    if (error) {
+      response.status(400).send(error);
+    } else {
+      response.status(200).json(students);
+    }
+  });
+});
+
 router.get("/find-one", (request, response) => {
   if (request.query.by) {
     switch (request.query.by) {

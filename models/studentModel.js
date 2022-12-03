@@ -118,6 +118,23 @@ studentSchema.static("findByName", function (name, callback) {
     }
   );
 });
+studentSchema.static("findBySearch", function (search, callback) {
+  return this.find(
+    {
+      $or: [
+        { firstName: new RegExp(search, "i") },
+        { lastName: new RegExp(search, "i") },
+      ],
+    },
+    (error, documents) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, documents);
+      }
+    }
+  );
+});
 //REFACTORING ENDS HERE
 
 const Student = mongoose.model("Student", studentSchema);

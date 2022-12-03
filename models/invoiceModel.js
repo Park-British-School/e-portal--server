@@ -2,65 +2,74 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const feeSchema = new Schema({
-  name: { type: String },
+  title: { type: String, required: true },
+  subTitle: { type: String },
   amount: {
     type: Number,
     required: true,
   },
-  hasVariant: {
-    type: String,
-    required: true,
-    default: false,
-  },
-  variant: { type: String },
 });
 
-const invoiceSchema = new Schema({
-  fees: [feeSchema],
-  type: { type: String, default: "INVOICE" },
-});
+const invoiceSchema = {
+  default: new mongoose.Schema(
+    {
+      fees: [feeSchema],
+      type: {
+        type: String,
+        required: true,
+        default: "DEFAULT",
+      },
+      issuedTo: {
+        type: String,
+        required: true,
+        ref: "Student",
+      },
+      issuedAt: {
+        type: Date,
+        default: new Date().getTime(),
+      },
+      status: {
+        type: String,
+        default: "Unpaid",
+        enum: {
+          values: ["Unpaid", "Paid", "Overdue", "PartPayment"],
+          message: "{VALUE} is not a valid option for status",
+        },
+      },
+    },
+    { collection: "invoices" }
+  ),
+  template: new mongoose.Schema(
+    {
+      fees: [feeSchema],
+      type: { type: String, default: "TEMPLATE" },
+      title: { type: String, required: true },
+    },
+    { collection: "invoices" }
+  ),
+  draft: new mongoose.Schema(
+    {
+      fees: [feeSchema],
+      type: { type: String, default: "DRAFT" },
+      issuedTo: {
+        type: String,
+        ref: "Student",
+      },
+      status: {
+        type: String,
+        default: "Unpaid",
+        enum: {
+          values: ["Unpaid", "Paid", "Overdue", "PartPayment"],
+          message: "{VALUE} is not a valid option for status",
+        },
+      },
+    },
+    { collection: "invoices" }
+  ),
+};
 
-module.exports = function (options) {
-  if (options) {
-    if (options.type === "TEMPLATE") {
-      invoiceSchema.add({
-        title: { type: String, required: true },
-      });
-      invoiceSchema.remove(["issuedTo", "issuedAt", "status"]);
-    }
-    if (options.type === "INVOICE") {
-      invoiceSchema.add({
-        issuedTo: {
-          type: String,
-          required: true,
-          ref: "Student",
-        },
-        issuedAt: {
-          type: Date,
-          default: new Date().getTime(),
-        },
-        status: {
-          type: String,
-          default: "Unpaid",
-          enum: ["Unpaid", "Paid", "Overdue", "PartPayment"],
-        },
-      });
-      invoiceSchema.remove("title");
-    }
-    if (options.type === "DRAFT") {
-      invoiceSchema.add({
-        issuedTo: {
-          type: String,
-          required: true,
-        },
-        status: {
-          type: String,
-          default: "Unpaid",
-          enum: ["Unpaid", "Paid", "Overdue", "PartPayment"],
-        },
-      });
-      invoiceSchema.remove(["title", "issuedAt"]);
-    }
-  }
-  return model("Invoice", invoiceSchema);
+module.exports = {
+  default: mongoose.model("INVOICE_DEFAULT", invoiceSchema.default),
+  template: mongoose.model("INVOICE_TEMPLATE", invoiceSchema.template),
+  draft: mongoose.model("INVOICE_DRAFT", invoiceSchema.draft),
 };

@@ -1,0 +1,19 @@
+@baseURL = http://localhost:3065
+
+###
+# @name COUNT_ALL_STUDENTS
+GET {{baseURL}}/students/count-all
+
+
+###
+# @name FIND_ALL_STUDENTS
+GET {{baseURL}}/students/find-all
+
+###
+# @name SEARCH
+POST {{baseURL}}/students/search
+Content-Type : application/json
+
+{
+  "search": "q"
+}
