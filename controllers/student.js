@@ -330,9 +330,12 @@ exports.results = {
         callback(error, null);
       } else {
         if (document) {
-          callback(null, document.results);
+          console.log(document);
+          callback(null, document.results ? document.results : []);
+          return false;
         } else {
           callback("Student not found!", null);
+          return false;
         }
       }
     });

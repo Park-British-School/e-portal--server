@@ -106,8 +106,10 @@ router.get("/:studentID/results", (request, response) => {
     request.params.studentID.replace(/-/g, "/"),
     (error, results) => {
       if (error) {
+        console.log("error ", error)
         response.status(400).send(error);
       } else {
+        console.log("data", results)
         response.status(200).json(results);
       }
     }

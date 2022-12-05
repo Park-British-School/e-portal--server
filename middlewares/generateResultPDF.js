@@ -2,7 +2,7 @@ const pdfKit = require("pdfkit");
 const fs = require("fs");
 
 function generateResultPDF(req, res, next) {
-  const result = req.body.result;
+  let result = req.body.result;
   const doc = new pdfKit({ size: "A4" });
 
   doc.roundedRect(30, 30, 535.28, 781.89, 50).stroke();
@@ -68,6 +68,7 @@ function generateResultPDF(req, res, next) {
 
   let col = 70;
   let row = 250;
+
   scoreSheet.shift();
   if (result.type === "midTerm") {
     doc
@@ -125,6 +126,35 @@ function generateResultPDF(req, res, next) {
       row += 20;
     });
   }
+
+  doc.lineWidth(1).fontSize(15).text("Electives", 50, row);
+
+  row += 15;
+
+  if (result.electives.length === 0) {
+    doc.fontSize(11).text("No electives to show", 53, row);
+    row += 15;
+  } else {
+    result.electives.forEach((elective, index) => {
+      doc
+        .lineWidth(0.5)
+        .rect(50, row, 80, 20)
+        .stroke()
+        .fontSize(11)
+        .text(elective.title, 53, row + 2);
+
+      doc
+        .lineWidth(0.5)
+        .rect(130, row, 80, 20)
+        .stroke()
+        .fontSize(11)
+        .text(elective.grade, 133, row + 2);
+
+      row += 20;
+    });
+  }
+
+  row += 10;
 
   doc
     .lineWidth(1)

@@ -37,6 +37,16 @@ const resultSchema = mongoose.Schema({
   overallPercentage: {
     type: Number,
   },
+  electives: [
+    {
+      title: {
+        type: String,
+      },
+      grade: {
+        type: String,
+      },
+    },
+  ],
   teachersRemark: {
     type: String,
     required: true,

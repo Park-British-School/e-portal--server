@@ -58,7 +58,7 @@ const studentSchema = new mongoose.Schema(
     invoices: [
       {
         type: String,
-        ref: "Invoice",
+        ref: "INVOICE_DEFAULT",
       },
     ],
     status: {

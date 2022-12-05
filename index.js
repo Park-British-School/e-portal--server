@@ -29,6 +29,7 @@ const {
 } = routers;
 
 const { invoiceModel } = models;
+invoiceModel.default();
 
 const server = express();
 server.use(express.json({ limit: "50mb" }));
