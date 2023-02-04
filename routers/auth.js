@@ -35,20 +35,7 @@ authRouter.post("/sign-in/teacher", (request, response) => {
   );
 });
 
-authRouter.post("/sign-in/admin", (request, response) => {
-  authController.signin.admin(
-    request.body.emailAddress,
-    request.body.password,
-    (error, data) => {
-      console.log(data);
-      if (error) {
-        response.status(400).send(error);
-      } else {
-        response.status(200).json(data);
-      }
-    }
-  );
-});
+authRouter.post("/sign-in/admin", authController.signin.admin);
 
 authRouter.get("/verify-access-token", (request, response) => {
   authController.verifyAccessToken(request.query.accessToken, (error, data) => {

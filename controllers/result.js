@@ -118,7 +118,7 @@ exports.countAllResults = function (callback) {
 
 exports.findAllResults = async function (options, callback) {
   if (options.paginate) {
-    Result.find()
+    Result.find({})
       .populate([
         { path: "class", select: "-image -password" },
         { path: "student", select: "-image -password" },

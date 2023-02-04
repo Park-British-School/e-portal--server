@@ -5,34 +5,29 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "esbuild ./index.js --bundle --platform=node --outfile=./build/index.js --packages=external"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
-    "canvas": "^2.9.0",
-    "commander": "^7.2.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
-    "express-handlebars": "^5.2.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.2",
     "multer": "^1.4.4",
     "pdfkit": "^0.13.0",
-    "pg": "^8.6.0",
-    "sequelize": "^6.6.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "esbuild": "^0.17.5",
     "nodemon": "^2.0.20",
     "prettier": "^2.7.1"
   }

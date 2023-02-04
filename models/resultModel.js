@@ -22,10 +22,12 @@ const resultSchema = mongoose.Schema({
   session: {
     type: String,
     required: true,
+    lowercase: true,
   },
   term: {
     type: String,
     required: true,
+    lowercase: true,
   },
   scoreSheet: {
     type: String,
@@ -47,10 +49,6 @@ const resultSchema = mongoose.Schema({
       },
     },
   ],
-  teachersRemark: {
-    type: String,
-    required: true,
-  },
   teachersRemark: {
     type: String,
     required: true,

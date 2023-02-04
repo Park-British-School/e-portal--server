@@ -28,7 +28,7 @@ const {
   announcementRouter,
 } = routers;
 
-const { invoiceModel } = models;
+const { invoiceModel, resultModel } = models;
 invoiceModel.default();
 
 const server = express();

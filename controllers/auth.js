@@ -1,8 +1,11 @@
 const jsonwebtoken = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const models = require("../models");
 const studentController = require("./student");
 const teacherController = require("./teacher");
 const adminController = require("./admin");
+
+const { administratorModel } = models;
 
 exports.signin = {
   student: async function (studentID, password, callback) {
@@ -99,52 +102,51 @@ exports.signin = {
     });
   },
 
-  admin: async function (emailAddress, password, callback) {
-    adminController.findAdminByEmailAddress(emailAddress, (error, admin) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        bcrypt
-          .compare(password, admin.password)
-          .then((match) => {
-            if (match) {
-              if (admin.status === "banned") {
-                callback(
-                  "This account has been banned, Please contact the administrator.",
-                  null
-                );
-              } else {
-                const accessToken = jsonwebtoken.sign(
-                  { id: admin._id, role: admin.role },
-                  process.env.TOKEN_SECRET
-                );
-                callback(null, {
-                  accessToken: accessToken,
-                  ...admin._doc,
-                });
-                // adminController.updateAdminByID(
-                //   admin.id,
-                //   {
-                //     $set: { lastSeen: new Date().getTime() },
-                //   },
-                //   (error) => {
-                //     if (error) {
-                //       callback(error, null);
-                //     } else {
-
-                //     }
-                //   }
-                // );
-              }
-            } else {
-              callback("Invalid email address or password", null);
-            }
-          })
-          .catch((error) => {
-            callback(error, null);
-          });
+  admin: async function (request, response) {
+    let emailAddress = request.body.emailAddress;
+    let password = request.body.password;
+    let administrator;
+    try {
+      administrator = await administratorModel.findOne({ email: emailAddress });
+      if (!administrator) {
+        return response.status(400).send("Invalid email address or password");
       }
-    });
+      let passwordMatch = await bcrypt.compare(
+        request.body.password,
+        administrator.password
+      );
+      if (!passwordMatch) {
+        return response.status(400).send("Incorrect password!");
+      }
+      if (
+        administrator.status === "banned" ||
+        administrator.status === "suspended"
+      ) {
+        return response
+          .status(400)
+          .send(
+            `This account has been ${administrator.status}, Please contact the administrator.`
+          );
+      }
+
+      await administratorModel.updateOne(
+        { _id: administrator._id },
+        {
+          $set: { lastSeen: new Date().getTime() },
+        }
+      );
+      const accessToken = jsonwebtoken.sign(
+        { id: administrator._id, role: administrator.role },
+        process.env.TOKEN_SECRET
+      );
+      response.status(200).json({
+        ...administrator.toJSON(),
+        accessToken: accessToken,
+      });
+    } catch (error) {
+      console.log(error.message);
+      response.status(400).send("unable to process this request");
+    }
   },
 };
 

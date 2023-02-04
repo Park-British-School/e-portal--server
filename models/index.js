@@ -2,10 +2,14 @@ const invoiceModel = require("./invoiceModel");
 const notificationModel = require("./notification");
 const announcementModel = require("./announcement");
 const studentModel = require("./studentModel")
+const administratorModel = require("./adminModel")
+const resultModel = require("./resultModel")
 
 module.exports = {
   invoiceModel,
   notificationModel,
   announcementModel,
-  studentModel
+  studentModel,
+  administratorModel,
+  resultModel
 };
