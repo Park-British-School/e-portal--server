@@ -27,7 +27,7 @@ jobs:
       - name: copy files to server
         uses: garygrossgarten/github-action-scp@v0.8.0
         with:
-          local: /home/runner/work/e-portal--client/e-portal--server/build
+          local: /home/runner/work/e-portal--server/e-portal--server/build
           remote: /home/parkbritish/api/app
           host: 167.99.139.37
           username: root
