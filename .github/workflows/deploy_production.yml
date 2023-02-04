@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: ["master"]
   workflow_dispatch:
-    
 
 jobs:
   deploy:
@@ -27,19 +26,19 @@ jobs:
       - name: copy files to server
         uses: garygrossgarten/github-action-scp@v0.8.0
         with:
-          local: /home/runner/work/e-portal--server/e-portal--server/build
+          local: /home/runner/work/e-portal--server/e-portal--server
           remote: /home/parkbritish/api/app
           host: 167.99.139.37
-          username: root
+          username: parkbritish
           password: alphabetagamma
       - name: restart account service
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 167.99.139.37
           port: 22
-          username: root
+          username: parkbritish
           password: alphabetagamma
           script: |
-            cd ./api/app
+            cd /home/parkbritish/api/app
             npm install
             pm2 restart all
