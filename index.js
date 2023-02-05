@@ -34,9 +34,9 @@ invoiceModel.default();
 
 const server = express();
 server.use(morgan("combined"))
+server.use(cors({origin: true}));
 server.use(express.json({ limit: "50mb" }));
 server.use(express.urlencoded({ limit: "50mb", extended: true }));
-server.use(cors());
 server.use("/", express.static(__dirname));
 server.use("/admins", adminRouter);
 server.use("/students", studentRouter);

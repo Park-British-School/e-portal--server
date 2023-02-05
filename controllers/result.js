@@ -127,7 +127,13 @@ exports.findAllResults = async function (options, callback) {
       .limit(options.count)
       .skip(options.count * (options.page - 1))
       .exec(function (error, results) {
-        callback(null, results);
+        if(error){
+          callback(error, null)
+        }
+        else{
+          callback(null, results);
+        }
+        
       });
   } else {
     Result.findAll((error, documents) => {
