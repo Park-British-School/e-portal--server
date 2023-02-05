@@ -122,18 +122,18 @@ exports.findAllResults = async function (options, callback) {
       .populate([
         { path: "class", select: "-image -password" },
         { path: "student", select: "-image -password" },
-        { path: "uploadedBy", select: "-image -password" },
       ])
       .limit(options.count)
       .skip(options.count * (options.page - 1))
       .exec(function (error, results) {
         if(error){
+          console.log(error)
           callback(error, null)
         }
         else{
           callback(null, results);
         }
-        
+      
       });
   } else {
     Result.findAll((error, documents) => {
