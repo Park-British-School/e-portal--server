@@ -6,7 +6,6 @@ exports.getAllResults = async function (req, res) {
     .populate([
       { path: "class", select: "-image -password" },
       { path: "student", select: "-image -password" },
-      { path: "uploadedBy", select: "-image -password" },
     ])
     .exec();
   res.status(200).json(results);
@@ -20,7 +19,6 @@ exports.getResultsByClass = async function (req, res) {
     .populate([
       { path: "class", select: "-password" },
       { path: "student", select: "-password" },
-      { path: "uploadedBy", select: "-password" },
     ])
     .exec();
   res.status(200).json(results);
@@ -30,7 +28,6 @@ exports.getResult = async function (req, res) {
   const result = await Result.findById(req.params.id).populate([
     "class",
     "student",
-    "uploadedBy",
   ]);
   res.status(200).json(result);
 };
@@ -126,14 +123,12 @@ exports.findAllResults = async function (options, callback) {
       .limit(options.count)
       .skip(options.count * (options.page - 1))
       .exec(function (error, results) {
-        if(error){
-          console.log(error)
-          callback(error, null)
-        }
-        else{
+        if (error) {
+          console.log(error);
+          callback(error, null);
+        } else {
           callback(null, results);
         }
-      
       });
   } else {
     Result.findAll((error, documents) => {

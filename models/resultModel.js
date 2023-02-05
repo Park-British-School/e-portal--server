@@ -86,7 +86,6 @@ resultSchema.static("findAll", function (callback) {
     .populate([
       { path: "class", select: "-image -password" },
       { path: "student", select: "-image -password" },
-      { path: "uploadedBy", select: "-image -password" },
     ])
     .exec((error, documents) => {
       if (error) {
