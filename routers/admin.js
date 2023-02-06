@@ -46,4 +46,17 @@ adminRouter.post("/create", (request, response) => {
   );
 });
 
+adminRouter.get("/password/reset", adminController.password.reset);
+
+adminRouter.get(
+  "/password/reset-pin/generate",
+  adminController.password.resetPin.generate
+);
+
+adminRouter.get(
+  "/password/reset-pin/verify",
+  adminController.password.resetPin.verify
+);
+
+
 module.exports = adminRouter;

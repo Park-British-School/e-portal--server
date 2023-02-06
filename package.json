@@ -25,11 +25,15 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
     "pdfkit": "^0.13.0",
+    "postmark": "^3.0.15",
+    "uid": "^2.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "esbuild": "^0.17.5",
+    "jest": "^29.4.1",
     "nodemon": "^2.0.20",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "supertest": "^6.3.3"
   }
 }

@@ -29,6 +29,10 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  allowPasswordReset: {
+    type: "Boolean",
+    default: false,
+  },
   role: {
     type: String,
     lowercase: true,

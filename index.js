@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const cors = require("cors");
-const morgan = require("morgan")
+const morgan = require("morgan");
 const multer = require("multer");
 const routers = require("./routers");
 const models = require("./models");
@@ -33,8 +33,8 @@ const { invoiceModel, resultModel } = models;
 invoiceModel.default();
 
 const server = express();
-server.use(morgan("combined"))
-server.use(cors({origin: true}));
+server.use(morgan("combined"));
+server.use(cors({ origin: true }));
 server.use(express.json({ limit: "50mb" }));
 server.use(express.urlencoded({ limit: "50mb", extended: true }));
 server.use("/", express.static(__dirname));
