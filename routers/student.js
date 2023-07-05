@@ -48,7 +48,7 @@ router.get("/find-one", (request, response) => {
     switch (request.query.by) {
       case "ID":
         studentController.findStudentByID(
-          request.query.ID,
+          request.query.ID.replaceAll("-", "/"),
           (error, student) => {
             if (error) {
               response.status(400).send(error);
