@@ -4,10 +4,10 @@ const studentSchema = new mongoose.Schema(
   {
     _id: {
       type: String,
-      unique: true,
       lowercase: true,
       trim: true,
       required: true,
+      index: false,
     },
     firstName: {
       type: String,
@@ -74,8 +74,20 @@ const studentSchema = new mongoose.Schema(
       default: () => new Date().getTime(),
     },
   },
-  { collection: "students", minimize: false }
+  {
+    collection: "students",
+    minimize: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+studentSchema.virtual("class", {
+  ref: "Class",
+  localField: "_id",
+  foreignField: "students",
+  justOne: true,
+});
 
 // REFACTORING STARTS HERE
 studentSchema.static("findAll", function (callback) {

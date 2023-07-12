@@ -1,5 +1,6 @@
 const Result = require("../models/resultModel");
 const Student = require("../models/studentModel");
+const models = require("../models");
 
 exports.getAllResults = async function (req, res) {
   const results = await Result.find({})
@@ -85,7 +86,6 @@ exports.downloadResult = async function (req, res, next) {
     const result = await Result.findById(resultID).populate([
       "class",
       "student",
-      "uploadedBy",
     ]);
     if (!result) {
       throw "Result not found";
@@ -94,6 +94,7 @@ exports.downloadResult = async function (req, res, next) {
       next();
     }
   } catch (error) {
+    console.log(error.message);
     res.status(400).json({
       error: {
         message: error,
@@ -233,5 +234,41 @@ exports.deleteResult = async function (resultID, callback) {
     }
   });
 };
+
+const findAll = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(await models.resultModel.countDocuments({}));
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const results = await models.resultModel
+      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ uploadedAt: -1, isApproved: "asc" })
+      .populate(["class", "student", "teacher"]);
+
+    return response.status(200).json({
+      data: {
+        results,
+        count: results.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 200 });
+  }
+};
+
+exports.findAll = findAll;
 
 // REFACTRING ENDS HERE

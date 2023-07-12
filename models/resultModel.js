@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const resultSchema = mongoose.Schema({
+const resultSchema = new mongoose.Schema({
   student: {
     type: String,
     ref: "Student",
@@ -16,6 +16,11 @@ const resultSchema = mongoose.Schema({
   },
   class: {
     type: mongoose.Types.ObjectId,
+    ref: "Class",
+    required: true,
+  },
+  teacher: {
+    type: "String",
     ref: "Class",
     required: true,
   },
@@ -63,6 +68,10 @@ const resultSchema = mongoose.Schema({
     type: String,
   },
   uploadedAt: {
+    type: Date,
+    default: () => new Date().getTime(),
+  },
+  updatedAt: {
     type: Date,
     default: () => new Date().getTime(),
   },

@@ -12,6 +12,100 @@ const Result = require("../models/resultModel");
 
 const { notificationModel, invoiceModel } = models;
 
+const metrics = async function (request, response) {
+  try {
+    let numberOfStudents = 0;
+    let numberOfSuspendedStudents = 0;
+
+    numberOfStudents += parseInt(models.studentModel.countDocuments({}));
+    numberOfSuspendedStudents += parseInt(
+      models.studentModel.countDocuments({ status: "suspended" })
+    );
+
+    return response.status(200).json({
+      data: {
+        numberOfStudents,
+        numberOfSuspendedStudents,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response.status(400).json({});
+  }
+};
+
+const find = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(
+      await models.studentModel.countDocuments({ ...request.body })
+    );
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const students = await models.studentModel
+      .find({ ...request.body }, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ createdAt: -1 })
+      .populate(["class", "results"]);
+
+    return response.status(200).json({
+      data: {
+        students,
+        count: students.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const findAll = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(await models.studentModel.countDocuments({}));
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const students = await models.studentModel
+      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ createdAt: -1 })
+      .populate(["class", "results"]);
+
+    return response.status(200).json({
+      data: {
+        students,
+        count: students.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
 exports.findAllStudents = async function (req, res) {
   const student = await Student.find({}).populate("class");
   res.json(student);
@@ -359,3 +453,7 @@ exports.invoices = {
 };
 
 //REFACTORING ENDS HERE
+
+exports.metrics = metrics;
+exports.find = find;
+exports.findAll = findAll;

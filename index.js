@@ -52,6 +52,21 @@ server.use("/notifications", notificationRouter);
 server.use("/auth", authRouter);
 server.use("/announcements", announcementRouter);
 
+server.use("/api/", express.static(__dirname));
+server.use("/api/admins", adminRouter);
+server.use("/api/students", studentRouter);
+server.use("/api/teachers", teacherRouter);
+server.use("/api/classes", classRouter);
+server.use("/api/results", resultRouter);
+server.use("/api/images", imageRouter);
+server.use("/api/term", termRouter);
+server.use("/api/session", sessionRouter);
+server.use("/api/invoices", invoiceRouter);
+server.use("/api/fees", feeRouter);
+server.use("/api/notifications", notificationRouter);
+server.use("/api/auth", authRouter);
+server.use("/api/announcements", announcementRouter);
+
 server.get("/ping", (request, response) => {
   console.log("PING!!!");
   response.status(200).end();

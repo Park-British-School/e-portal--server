@@ -6,6 +6,8 @@ const middlewares = require("../middlewares");
 const { studentController } = controllers;
 const { generateStudentID } = middlewares;
 
+router.get("/metrics", controllers.studentController.metrics);
+
 router.get("/count-all", (request, response) => {
   studentController.countAllStudents((error, count) => {
     if (error) {
@@ -16,22 +18,9 @@ router.get("/count-all", (request, response) => {
   });
 });
 
-router.get("/find-all", (request, response) => {
-  studentController.findAllStudents(
-    {
-      paginate: request.query.paginate === "true" ? true : false,
-      count: request.query.count ? parseInt(request.query.count) : 10,
-      page: request.query.page ? parseInt(request.query.page) : 1,
-    },
-    (error, students) => {
-      if (error) {
-        response.status(400).send(error);
-      } else {
-        response.status(200).json(students);
-      }
-    }
-  );
-});
+router.post("/find", controllers.studentController.find);
+
+router.get("/find-all", controllers.studentController.findAll);
 
 router.post("/search", (request, response) => {
   studentController.search(request.body.search, (error, students) => {
@@ -106,10 +95,10 @@ router.get("/:studentID/results", (request, response) => {
     request.params.studentID.replace(/-/g, "/"),
     (error, results) => {
       if (error) {
-        console.log("error ", error)
+        console.log("error ", error);
         response.status(400).send(error);
       } else {
-        console.log("data", results)
+        console.log("data", results);
         response.status(200).json(results);
       }
     }
