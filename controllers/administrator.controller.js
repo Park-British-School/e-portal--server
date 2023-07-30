@@ -1,21 +1,16 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const jsonwebtoken = require("jsonwebtoken");
-const Admin = require("../models/adminModel");
 const uid = require("uid");
 const models = require("../models");
 const utils = require("../utils");
 const services = require("../services");
 
-exports.getAdmin = async function (req, res) {
-  const admin = await Admin.findOne({ _id: req.params.id });
-  res.status(200).json(admin);
-};
-
 exports.createAdmin = async function (data, callback) {
   const salt = await bcrypt.genSalt(3);
   const hashedPassword = await bcrypt.hash(data.password, salt);
-  Admin.create({ ...data, password: hashedPassword })
+  models.administratorModel
+    .create({ ...data, password: hashedPassword })
     .then((document) => {
       callback(null, document);
     })
@@ -24,40 +19,144 @@ exports.createAdmin = async function (data, callback) {
     });
 };
 
-exports.findAllAdmins = async function (options, callback) {
-  if (options.paginate) {
-    Admin.find()
-      .sort({
-        firstName: "asc",
-      })
-      .limit(options.count)
-      .skip(options.count * (options.page - 1))
-      .exec(function (error, admins) {
-        if (error) {
-          callback(error, null);
-        } else {
-          callback(null, admins);
-        }
-      });
-  } else {
-    Admin.findAll((error, documents) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        callback(null, documents);
-      }
+const findAll = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(await models.administratorModel.countDocuments({}));
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const administrators = await models.administratorModel
+      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ createdAt: -1 });
+
+    return response.status(200).json({
+      data: {
+        administrators,
+        count: administrators.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
     });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
   }
 };
 
-exports.findAdminByEmailAddress = async function (emailAddress, callback) {
-  Admin.findByEmailAddress(emailAddress, (error, document) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      callback(null, document);
+const findOne = async function (request, response) {
+  try {
+    let administrator;
+    administrator = await models.administratorModel.findOne({
+      _id: request.query.id,
+    });
+    if (!administrator) {
+      return response
+        .status(400)
+        .json({ message: "Administrator not found!", statusCode: 400 });
     }
-  });
+
+    return response
+      .status(200)
+      .json({ message: "Success!", data: { administrator }, statusCode: 200 });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const updateOne = async function (request, response) {
+  try {
+    let administrator;
+
+    administrator = await models.administratorModel.findOne({
+      _id: request.query.id,
+    });
+
+    if (!administrator) {
+      return response
+        .status(400)
+        .json({ message: "Administrator not found!", statusCode: 400 });
+    }
+
+    switch (request.query.operation) {
+      case "update":
+        await models.administratorModel.updateOne(
+          { _id: request.query.id },
+          { $set: { ...request.body } }
+        );
+        return response.status(200).json({
+          message: "Administrator updated successfully!",
+          statusCode: 200,
+        });
+
+      case "ban":
+        await models.administratorModel.updateOne(
+          { _id: administrator._id },
+          { $set: { status: "banned" } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Administrator banned successfully!" });
+
+      case "unban":
+        await models.administratorModel.updateOne(
+          { _id: administrator._id },
+          { $set: { status: "active" } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Administrator unbanned successfully!" });
+      default:
+        return response
+          .status(400)
+          .json({ message: "Invalid operation!", statusCode: 400 });
+    }
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const deleteOne = async function (request, response) {
+  try {
+    let administrator;
+    administrator = await models.administratorModel.findOne({
+      _id: request.query.id,
+    });
+    if (!administrator) {
+      return response
+        .status(400)
+        .json({ message: "Administrator not found!", statusCode: 400 });
+    }
+
+    await models.administratorModel.deleteOne({ _id: administrator._id });
+
+    return response.status(200).json({
+      message: "Administrator deleted successfully!",
+      statusCode: 400,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
 };
 
 exports.password = {
@@ -136,6 +235,7 @@ exports.password = {
         );
     }
   },
+
   resetPin: {
     generate: async function (request, response) {
       try {
@@ -247,3 +347,8 @@ exports.password = {
     },
   },
 };
+
+exports.findAll = findAll;
+exports.updateOne = updateOne;
+exports.deleteOne = deleteOne;
+exports.findOne = findOne;

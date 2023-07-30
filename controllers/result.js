@@ -1,9 +1,8 @@
-const Result = require("../models/resultModel");
-const Student = require("../models/studentModel");
 const models = require("../models");
 
 exports.getAllResults = async function (req, res) {
-  const results = await Result.find({})
+  const results = await models.resultModel
+    .find({})
     .populate([
       { path: "class", select: "-image -password" },
       { path: "student", select: "-image -password" },
@@ -14,7 +13,8 @@ exports.getAllResults = async function (req, res) {
 
 exports.getResultsByClass = async function (req, res) {
   const classID = req.params.classID;
-  const results = await Result.find({})
+  const results = await models.resultModel
+    .find({})
     .where("class")
     .equals(classID)
     .populate([
@@ -26,23 +26,22 @@ exports.getResultsByClass = async function (req, res) {
 };
 
 exports.getResult = async function (req, res) {
-  const result = await Result.findById(req.params.id).populate([
-    "class",
-    "student",
-  ]);
+  const result = await models.resultModel
+    .findById(req.params.id)
+    .populate(["class", "student"]);
   res.status(200).json(result);
 };
 
 exports.addResult = async function (req, res) {
   const studentID = req.body.student;
   try {
-    const student = Student.findById(studentID);
+    const student = models.studentModel.findById(studentID);
     if (student) {
-      const newResult = await new Result({
+      const newResult = await models.resultModel({
         ...req.body,
-      }).save();
+      });
 
-      await Student.updateOne(
+      await models.studentModel.updateOne(
         { _id: req.body.student },
         { $push: { results: newResult._id } }
       );
@@ -61,32 +60,12 @@ exports.addResult = async function (req, res) {
   }
 };
 
-exports.editResult = async function (req, res) {
-  try {
-    const resultID = req.params.resultID;
-    await Result.updateOne(
-      { _id: resultID },
-      { ...req.body, isApproved: false }
-    );
-
-    res.status(200).json({});
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      error: {
-        message: err,
-      },
-    });
-  }
-};
-
 exports.downloadResult = async function (req, res, next) {
   try {
     const resultID = req.params.resultID;
-    const result = await Result.findById(resultID).populate([
-      "class",
-      "student",
-    ]);
+    const result = await models.resultModel
+      .findById(resultID)
+      .populate(["class", "student"]);
     if (!result) {
       throw "Result not found";
     } else {
@@ -105,7 +84,7 @@ exports.downloadResult = async function (req, res, next) {
 
 // REFACTRING STARTS HERE
 exports.countAllResults = function (callback) {
-  Result.countDocuments({}, (error, count) => {
+  models.resultModel.countDocuments({}, (error, count) => {
     if (error) {
       callback(error, null);
     } else {
@@ -116,7 +95,8 @@ exports.countAllResults = function (callback) {
 
 exports.findAllResults = async function (options, callback) {
   if (options.paginate) {
-    Result.find({})
+    models.resultModel
+      .find({})
       .populate([
         { path: "class", select: "-image -password" },
         { path: "student", select: "-image -password" },
@@ -132,7 +112,7 @@ exports.findAllResults = async function (options, callback) {
         }
       });
   } else {
-    Result.findAll((error, documents) => {
+    models.resultModel.findAll((error, documents) => {
       if (error) {
         callback(error, null);
       } else {
@@ -143,7 +123,7 @@ exports.findAllResults = async function (options, callback) {
 };
 
 exports.findResultbyID = async function (ID, callback) {
-  Result.findByID(ID, (error, document) => {
+  models.resultModel.findByID(ID, (error, document) => {
     if (error) {
       callback(error, null);
     } else {
@@ -153,7 +133,7 @@ exports.findResultbyID = async function (ID, callback) {
 };
 
 exports.findResultsByStudentID = async function (studentID, callback) {
-  Result.findResultByStudentID(studentID, (error, document) => {
+  models.resultModel.findResultByStudentID(studentID, (error, document) => {
     if (error) {
       callback(error, null);
     } else {
@@ -162,36 +142,37 @@ exports.findResultsByStudentID = async function (studentID, callback) {
   });
 };
 
-exports.uploadResult = async function (data, callback) {
-  Student.findById(data.student, (error, student) => {
-    if (student) {
-      Result.create({ ...data })
-        .then((result) => {
-          Student.updateOne(
-            { _id: data.student },
-            { $push: { results: result._id } },
-            (error) => {
-              if (error) {
-                callback(error);
-              } else {
-                callback(null);
-              }
-            }
-          );
-        })
-        .catch((error) => {
-          callback(error);
-        });
-    } else {
-      callback(
-        "This student does not exist!, Please check the ID and try again"
-      );
+const upload = async function (request, response) {
+  console.log("REQUEST BODY FOR RESULT", request.body);
+  try {
+    const student = await models.studentModel.findOne({
+      _id: request.body.student,
+    });
+    if (!student) {
+      return response
+        .status(400)
+        .json({ message: "Student not found!", statusCode: 400 });
     }
-  });
+    const result = await models.resultModel.create({ ...request.body });
+    await models.studentModel.updateOne(
+      { _id: request.body.student },
+      { $push: { results: result._id } }
+    );
+
+    return response
+      .status(200)
+      .json({ message: "Result uploaded successfully!", statusCode: 200 });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 200 });
+  }
 };
 
 exports.approveResult = async function (resultID, callback) {
-  Result.updateOne(
+  models.resultModel.updateOne(
     { _id: resultID },
     { $set: { isApproved: true } },
     (error) => {
@@ -205,11 +186,12 @@ exports.approveResult = async function (resultID, callback) {
 };
 
 exports.deleteResult = async function (resultID, callback) {
-  Result.deleteOne({ _id: resultID }, (error) => {
+  models.resultModel.deleteOne({ _id: resultID }, (error) => {
     if (error) {
       callback(error);
     } else {
-      Student.find()
+      models.studentModel
+        .find()
         .where("results")
         .in(resultID)
         .exec((error, students) => {
@@ -218,7 +200,7 @@ exports.deleteResult = async function (resultID, callback) {
             console.log(error);
           } else {
             students.forEach((student, index) => {
-              Student.updateOne(
+              models.studentModel.updateOne(
                 { _id: student._id },
                 { $pull: { results: resultID } },
                 (error) => {
@@ -235,6 +217,47 @@ exports.deleteResult = async function (resultID, callback) {
   });
 };
 
+const search = async function (request, response) {
+  try {
+    let students = [];
+    let results = [];
+    if (
+      !request.query.search ||
+      request.query.search.trim() === "" ||
+      request.query.search.trim().length < 3
+    ) {
+      return response.status(400).json({
+        message: "Search query must 3 or more letters!",
+        statusCode: 400,
+      });
+    }
+    students = await models.studentModel.find({
+      $or: [
+        { firstName: new RegExp(request.query.search, "i") },
+        { lastName: new RegExp(request.query.search, "i") },
+        { emailAddress: new RegExp(request.query.search, "i") },
+      ],
+    });
+    results = await models.resultModel
+      .find({
+        student: [...students.map((student) => student._id)],
+      })
+      .populate(["student", "class"]);
+
+    return response.status(200).json({
+      message: `${results.length} results found`,
+      statusCode: 400,
+      data: { results },
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
 const findAll = async function (request, response) {
   try {
     let count = parseInt(request.query.count) || 10;
@@ -248,7 +271,7 @@ const findAll = async function (request, response) {
     const results = await models.resultModel
       .find({}, {}, { limit: count, skip: (page - 1) * count })
       .sort({ uploadedAt: -1, isApproved: "asc" })
-      .populate(["class", "student", "teacher"]);
+      .populate(["class", "student"]);
 
     return response.status(200).json({
       data: {
@@ -269,6 +292,87 @@ const findAll = async function (request, response) {
   }
 };
 
-exports.findAll = findAll;
+const findOne = async function (request, response) {
+  try {
+    let result;
+    result = await models.resultModel
+      .findOne({ _id: request.query.id })
+      .populate(["class", "student"]);
+    if (!result) {
+      return response
+        .status(400)
+        .json({ message: "Result not found!", statusCode: 400 });
+    }
+    return response
+      .status(200)
+      .json({ message: "Success", data: { result: result }, statusCode: 200 });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
 
-// REFACTRING ENDS HERE
+const updateOne = async function (request, response) {
+  try {
+    switch (request.query.operation) {
+      case "update":
+        await models.resultModel.updateOne(
+          { _id: request.body._id },
+          { $set: { ...request.body } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Success", statusCode: 200 });
+
+      default:
+        return response
+          .status(400)
+          .json({ message: "Unknown operation!", statusCode: 400 });
+    }
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const deleteOne = async function (request, response) {
+  try {
+    const result = await models.resultModel.findOne({ _id: request.query.id });
+    if (!result) {
+      return response
+        .status(400)
+        .json({ message: "Result not found!", statusCode: 400 });
+    }
+
+    await models.resultModel.deleteOne({ _id: request.query.id });
+
+    await models.studentModel.updateOne(
+      { _id: result.student },
+      { $pull: { results: request.query.id } }
+    );
+    return response
+      .status(200)
+      .json({ message: "Result deleted successfully!", statusCode: 200 });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+exports.search = search;
+exports.findAll = findAll;
+exports.findOne = findOne;
+exports.updateOne = updateOne;
+exports.deleteOne = deleteOne;
+exports.upload = upload;
+
+// REFACTORING ENDS HERE

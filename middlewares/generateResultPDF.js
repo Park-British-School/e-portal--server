@@ -123,7 +123,7 @@ function generateResultPDF(req, res, next) {
         doc.text(item.value.toString().toUpperCase(), col, row, { bold: true });
         col += 100;
       });
-      row += 20;
+      row += 15;
     });
   }
 

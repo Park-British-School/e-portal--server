@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const models = require("../models");
 const studentController = require("./student");
 const teacherController = require("./teacher");
-const adminController = require("./admin");
+const adminController = require("./administrator.controller");
 
 const { administratorModel } = models;
 

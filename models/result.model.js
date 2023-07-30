@@ -19,11 +19,6 @@ const resultSchema = new mongoose.Schema({
     ref: "Class",
     required: true,
   },
-  teacher: {
-    type: "String",
-    ref: "Class",
-    required: true,
-  },
   session: {
     type: String,
     required: true,
@@ -56,7 +51,6 @@ const resultSchema = new mongoose.Schema({
   ],
   teachersRemark: {
     type: String,
-    required: true,
   },
   principalsRemark: {
     type: String,

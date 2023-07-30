@@ -4,6 +4,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const Teacher = require("../models/teacherModel");
 const Class = require("../models/classModel");
 const fs = require("fs");
+const models = require("../models");
 
 exports.getAllTeachers = async function (req, res) {
   const teachers = await Teacher.find({}, "-image");
@@ -307,4 +308,113 @@ exports.deleteTeacherByID = async function (ID, callback) {
   });
 };
 
-//REFACTORING ENDS HERE
+const findAll = async function (request, response) {
+  try {
+    let teachers = [];
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(await models.teacherModel.countDocuments({}));
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    teachers = await models.teacherModel
+      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ createdAt: -1 })
+      .populate(["class"]);
+
+    return response.status(200).json({
+      data: {
+        teachers,
+        count: teachers.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const findOne = async function (request, response) {
+  try {
+    let teacher;
+
+    teacher = await models.teacherModel
+      .findOne({ _id: request.query.id })
+      .populate(["class"]);
+    if (!teacher) {
+      return response
+        .status(400)
+        .json({ message: "Teacher not found!", statusCode: 400 });
+    }
+
+    return response
+      .status(200)
+      .json({ data: { teacher }, message: "Success!", statusCode: 200 });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const updateOne = async function (request, response) {
+  try {
+    let teacher;
+    teacher = await models.teacherModel.findOne({ _id: request.query.id });
+    if (!teacher) {
+      return response
+        .status(400)
+        .json({ message: "Teacher not found!", statusCode: 400 });
+    }
+
+    switch (request.query.operation) {
+      case "update":
+        return response
+          .status(200)
+          .json({ message: "Teacher updated successfully!", statusCode: 200 });
+
+      case "ban":
+        await models.teacherModel.updateOne(
+          { _id: request.query.id },
+          { $set: { status: "banned", updatedAt: new Date().getTime() } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Teacher banned successfully", statusCode: 200 });
+
+      case "unban":
+        await models.teacherModel.updateOne(
+          { _id: request.query.id },
+          { $set: { status: "active", updatedAt: new Date().getTime() } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Teacher unbanned successfully", statusCode: 200 });
+      default:
+        return response
+          .status(400)
+          .json({ message: "Invalid operation!", statusCode: 400 });
+    }
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+exports.findAll = findAll;
+exports.findOne = findOne;
+exports.updateOne = updateOne;

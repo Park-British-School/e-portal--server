@@ -8,7 +8,6 @@ const classController = require("./class");
 
 const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
-const Result = require("../models/resultModel");
 
 const { notificationModel, invoiceModel } = models;
 
@@ -97,6 +96,101 @@ const findAll = async function (request, response) {
       },
       statusCode: 200,
     });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const findOne = async function (request, response) {
+  try {
+    let student;
+    let id = (student = await models.studentModel
+      .findOne({ _id: request.query.id.replace(/-/g, "/") })
+      .populate(["class", "results"]));
+    if (!student) {
+      return response
+        .status(400)
+        .json({ message: "Student not found!", statusCode: 400 });
+    }
+    return response.status(200).json({
+      data: { student: student },
+      statusCode: 200,
+      message: "Success!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const updateOne = async function (request, response) {
+  try {
+    const student = await models.studentModel.findOne({
+      _id: request.query.id.replace(/-/g, "/"),
+    });
+    if (!student) {
+      return response
+        .status(400)
+        .json({ message: "Student not found!", statusCode: 400 });
+    }
+
+    switch (request.query.operation) {
+      case "update":
+        await models.studentModel.updateOne(
+          { _id: request.query.id.replace(/-/g, "/") },
+          { ...request.body }
+        );
+        return response
+          .status(200)
+          .json({ message: "Success!", statusCode: 200 });
+      case "update_password":
+        const salt = await bcrypt.genSalt(3);
+        const hashedPassword = await bcrypt.hash(request.body.password, salt);
+        await models.studentModel.updateOne(
+          { _id: request.query.id.replace(/-/g, "/") },
+          { $set: { password: hashedPassword } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Password updated successfully!", statusCode: 200 });
+      default:
+        return response
+          .status(400)
+          .json({ message: "Unknown operation!", statusCode: 400 });
+    }
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const search = async function (request, response) {
+  try {
+    let students = [];
+    if (
+      request.query.search &&
+      request.query.search.trim() !== "" &&
+      request.query.search.trim().length > 2
+    ) {
+      students = await models.studentModel.find({
+        $or: [
+          { firstName: new RegExp(request.query.search, "i") },
+          { lastName: new RegExp(request.query.search, "i") },
+          { emailAddress: new RegExp(request.query.search, "i") },
+        ],
+      });
+    }
+
   } catch (error) {
     console.log(error.message);
     console.log(error.stack);
@@ -229,7 +323,7 @@ exports._delete = async function (req, res) {
       { $pull: { students: student._id } }
     );
     await student.results.forEach(async (result) => {
-      await Result.deleteOne({ _id: result });
+      await models.resultModel.deleteOne({ _id: result });
     });
     res.status(200).json({});
   } catch (err) {
@@ -296,16 +390,6 @@ exports.findAllStudents = async function (options, callback) {
       }
     });
   }
-};
-
-exports.search = async function (search, callback) {
-  Student.findBySearch(search, (error, documents) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      callback(null, documents);
-    }
-  });
 };
 
 exports.findStudentByID = async function (studentID, callback) {
@@ -382,7 +466,8 @@ exports.deleteStudentByID = async function (studentID, callback) {
     if (error) {
       callback(error);
     } else {
-      Result.find()
+      models.resultModel
+        .find()
         .where("student")
         .equals(studentID)
         .exec((error, results) => {
@@ -390,7 +475,7 @@ exports.deleteStudentByID = async function (studentID, callback) {
             callback(error);
           } else {
             results.forEach((result, index) => {
-              Result.deleteOne({ _id: result._id }, (error) => {
+              models.resultModel.deleteOne({ _id: result._id }, (error) => {
                 if (error) {
                   console.log(error);
                 }
@@ -456,4 +541,7 @@ exports.invoices = {
 
 exports.metrics = metrics;
 exports.find = find;
+exports.search = search;
 exports.findAll = findAll;
+exports.findOne = findOne;
+exports.updateOne = updateOne;

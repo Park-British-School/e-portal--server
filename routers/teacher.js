@@ -3,17 +3,6 @@ const controllers = require("../controllers");
 
 const { teacherController } = controllers;
 
-// router.get("/", getAllTeachers)
-
-// router.post("/addTeacher", addTeacher)
-// router.post("/signin", login)
-// router.post("/:teacherID/profile/edit", editProfile)
-// router.get("/activate/:teacherID", activate)
-// router.get("/deactivate/:teacherID", deactivate)
-// router.get("/delete/:teacherID", _delete)
-
-// REFACTORING STARTS HERE
-
 router.get("/count-all", (request, response) => {
   teacherController.countAllTeachers((error, count) => {
     if (error) {
@@ -24,7 +13,7 @@ router.get("/count-all", (request, response) => {
   });
 });
 
-router.get("/find-all", (request, response) => {
+router.get("/find-all-deprecated", (request, response) => {
   teacherController.findAllTeachers({}, (error, teachers) => {
     if (error) {
       response.status(400).send(error);
@@ -34,7 +23,7 @@ router.get("/find-all", (request, response) => {
   });
 });
 
-router.get("/find-one", (request, response) => {
+router.get("/find-one-deprecated", (request, response) => {
   if (request.query.by) {
     switch (request.query.by) {
       case "ID":
@@ -157,6 +146,10 @@ router.get("/delete-one", (request, response) => {
     response.status(400).send("Incorrect query parameters");
   }
 });
+
+router.get("/find-all", controllers.teacherController.findAll);
+router.get("/find-one", controllers.teacherController.findOne);
+router.post("/update-one", controllers.teacherController.updateOne);
 
 router.get("/:id", teacherController.getTeacher);
 

@@ -21,18 +21,12 @@ router.get("/count-all", (request, response) => {
 router.post("/find", controllers.studentController.find);
 
 router.get("/find-all", controllers.studentController.findAll);
+router.get("/find-one", controllers.studentController.findOne);
+router.post("/update-one", controllers.studentController.updateOne);
 
-router.post("/search", (request, response) => {
-  studentController.search(request.body.search, (error, students) => {
-    if (error) {
-      response.status(400).send(error);
-    } else {
-      response.status(200).json(students);
-    }
-  });
-});
+router.get("/search", controllers.studentController.search);
 
-router.get("/find-one", (request, response) => {
+router.get("/find-one-deprecated", (request, response) => {
   if (request.query.by) {
     switch (request.query.by) {
       case "ID":

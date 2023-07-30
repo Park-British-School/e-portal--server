@@ -1,6 +1,6 @@
 const invoiceController = require("./invoice");
 const notificationController = require("./notification");
-const adminController = require("./admin");
+const administratorController = require("./administrator.controller");
 const studentController = require("./student");
 const classController = require("./class");
 const resultController = require("./result");
@@ -14,7 +14,7 @@ const announcementController = require("./announcement");
 module.exports = {
   invoiceController,
   notificationController,
-  adminController,
+  administratorController,
   studentController,
   classController,
   resultController,

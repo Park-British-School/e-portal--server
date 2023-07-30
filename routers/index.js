@@ -3,7 +3,7 @@ const teacherRouter = require("./teacher");
 const classRouter = require("./class");
 const resultRouter = require("./result");
 const imageRouter = require("./image");
-const adminRouter = require("./admin");
+const administratorRouter = require("./administrator.router");
 const termRouter = require("./term");
 const sessionRouter = require("./session");
 const invoiceRouter = require("./invoice");
@@ -18,7 +18,7 @@ module.exports = {
   classRouter,
   resultRouter,
   imageRouter,
-  adminRouter,
+  administratorRouter,
   termRouter,
   sessionRouter,
   invoiceRouter,

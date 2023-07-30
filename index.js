@@ -19,7 +19,6 @@ const {
   classRouter,
   resultRouter,
   imageRouter,
-  adminRouter,
   termRouter,
   sessionRouter,
   invoiceRouter,
@@ -38,7 +37,7 @@ server.use(cors({ origin: true }));
 server.use(express.json({ limit: "50mb" }));
 server.use(express.urlencoded({ limit: "50mb", extended: true }));
 server.use("/", express.static(__dirname));
-server.use("/admins", adminRouter);
+server.use("/admins", routers.administratorRouter);
 server.use("/students", studentRouter);
 server.use("/teachers", teacherRouter);
 server.use("/classes", classRouter);
@@ -53,11 +52,11 @@ server.use("/auth", authRouter);
 server.use("/announcements", announcementRouter);
 
 server.use("/api/", express.static(__dirname));
-server.use("/api/admins", adminRouter);
-server.use("/api/students", studentRouter);
+server.use("/api/administrators", routers.administratorRouter);
+server.use("/api/students", routers.studentRouter);
 server.use("/api/teachers", teacherRouter);
 server.use("/api/classes", classRouter);
-server.use("/api/results", resultRouter);
+server.use("/api/results", routers.resultRouter);
 server.use("/api/images", imageRouter);
 server.use("/api/term", termRouter);
 server.use("/api/session", sessionRouter);
