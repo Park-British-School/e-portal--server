@@ -11,7 +11,7 @@ function generateResultPDF(req, res, next) {
   doc.image("static/images/logos/logo.png", 495, 50, { width: 50 });
 
   doc
-    .font("Times-Bold")
+    .font("Times-Roman")
     .fontSize(25)
     .text(`${result.school.toUpperCase()}`, {
       bold: true,
@@ -36,16 +36,16 @@ function generateResultPDF(req, res, next) {
 
   doc
     .lineCap("round")
-    .lineWidth(4)
+    .lineWidth(2)
     .moveTo(50, 165)
     .lineTo(545.28, 165)
     .stroke();
 
   doc
     .lineCap("round")
-    .lineWidth(4)
-    .moveTo(50, 210)
-    .lineTo(545.28, 210)
+    .lineWidth(2)
+    .moveTo(50, 205)
+    .lineTo(545.28, 205)
     .stroke();
 
   doc
@@ -67,14 +67,14 @@ function generateResultPDF(req, res, next) {
   const scoreSheet = JSON.parse(result.scoreSheet);
 
   let col = 70;
-  let row = 250;
+  let row = 230;
 
   scoreSheet.shift();
   if (result.type === "midTerm") {
     doc
-      .text("SYLLABUS TITLE", 70, 230)
-      .text("SCORE", 320, 230)
-      .text("GRADE", 470, 230);
+      .text("SYLLABUS TITLE", 70, 215)
+      .text("SCORE", 320, 215)
+      .text("GRADE", 470, 215);
 
     scoreSheet.forEach((item, index, array) => {
       item.forEach((item, index) => {
@@ -90,18 +90,18 @@ function generateResultPDF(req, res, next) {
         doc.text(item.value.toString().toUpperCase(), col, row, { bold: true });
         col += 100;
       });
-      row += 20;
+      row += 15;
     });
   }
 
   if (result.type === "endOfTerm") {
     doc
       .fontSize(9)
-      .text("SYLLABUS TITLE", 70, 230)
-      .text("TEST", 300, 230)
-      .text("EXAM", 340, 230)
-      .text("AVG. PERCENTAGE", 390, 230)
-      .text("GRADE", 490, 230);
+      .text("SYLLABUS TITLE", 70, 215)
+      .text("TEST", 300, 215)
+      .text("EXAM", 340, 215)
+      .text("AVG. PERCENTAGE", 390, 215)
+      .text("GRADE", 490, 215);
 
     scoreSheet.forEach((item, index, array) => {
       item.forEach((item, index) => {
@@ -127,28 +127,28 @@ function generateResultPDF(req, res, next) {
     });
   }
 
-  doc.lineWidth(1).fontSize(15).text("Electives", 50, row);
+  row += 10;
 
-  row += 15;
+  doc
+    .lineWidth(1)
+    .fontSize(11)
+    .text("ELECTIVES", 70, row)
+    .lineCap("round")
+    .lineWidth(1)
+    .moveTo(50, row + 15)
+    .lineTo(545.28, row + 15)
+    .stroke();
+
+  row += 25;
 
   if (result.electives.length === 0) {
-    doc.fontSize(11).text("No electives to show", 53, row);
+    doc.fontSize(11).text("No electives to show", 70, row);
     row += 15;
   } else {
     result.electives.forEach((elective, index) => {
-      doc
-        .lineWidth(0.5)
-        .rect(50, row, 80, 20)
-        .stroke()
-        .fontSize(11)
-        .text(elective.title, 53, row + 2);
+      doc.fontSize(11).text(elective.title, 73, row + 2);
 
-      doc
-        .lineWidth(0.5)
-        .rect(130, row, 80, 20)
-        .stroke()
-        .fontSize(11)
-        .text(elective.grade, 133, row + 2);
+      doc.fontSize(11).text(elective.grade, 300, row + 2);
 
       row += 20;
     });
@@ -157,27 +157,31 @@ function generateResultPDF(req, res, next) {
   row += 10;
 
   doc
-    .lineWidth(1)
-    .rect(50, row, 150, 40)
-    .stroke()
     .fontSize(11)
-    .text("CLASS TEACHER'S REMARK", 53, row + 3, { width: 150 });
+    .text("CLASS TEACHER'S REMARK", 70, row, { width: 300 })
+    .lineCap("round")
+    .lineWidth(1)
+    .moveTo(50, row + 15)
+    .lineTo(545.28, row + 15)
+    .stroke();
+
+  row += 25;
+
+  doc.fontSize(11).text(result.teachersRemark, 70, row);
+
+  row += Math.ceil(result.teachersRemark.length / 110) * 15;
+
+  row += 25;
 
   doc
+    .text("PRINCIPAL'S REMARK AND SIGNATURE", 70, row, { bold: true })
+    .lineCap("round")
     .lineWidth(1)
-    .rect(50 + 150, row, 350, 40)
+    .moveTo(50, row + 15)
+    .lineTo(545.28, row + 15)
     .stroke()
     .fontSize(11)
-    .text(result.teachersRemark, 53 + 150, row + 3);
-
-  doc
-    .lineWidth(1)
-    .rect(50, row + 40, 500, 90)
-    .stroke()
-    .fontSize(14)
-    .text("Principal's Remark and Signature:", 54, row + 44, { bold: true })
-    .fontSize(11)
-    .text(result.principalsRemark, 54, row + 65);
+    .text(result.principalsRemark, 70, row + 20);
 
   if (result.isApproved) {
     doc

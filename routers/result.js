@@ -41,11 +41,8 @@ router.get("/count-all", (request, response) => {
   });
 });
 
-// REFACTORING ENDS HERE
-
 router.get("/:id", resultController.getResult);
-//
-// router.post("/", aggregateScores, resultController.addResult);
+
 router.get("/:resultID/approve", (request, response) => {
   resultController.approveResult(request.params.resultID, (error) => {
     if (error) {
