@@ -1,14 +1,14 @@
 const express = require("express");
-const jsonwebtoken = require("jsonwebtoken");
 const controllers = require("../controllers");
+const middlewares = require("../middlewares");
 
 const { Router } = express;
 const { authController } = controllers;
 
 const authRouter = Router();
 
-authRouter.post("/sign-in/student", (request, response) => {
-  authController.signin.student(
+authRouter.post("/sign-in/student-deprecated", (request, response) => {
+  authController.signin_deprecated.student(
     request.body.studentID || "",
     request.body.password || "",
     (error, accessToken) => {
@@ -21,8 +21,8 @@ authRouter.post("/sign-in/student", (request, response) => {
   );
 });
 
-authRouter.post("/sign-in/teacher", (request, response) => {
-  authController.signin.teacher(
+authRouter.post("/sign-in/teacher-deprecated", (request, response) => {
+  authController.signin_deprecated.teacher(
     request.body.email,
     request.body.password,
     (error, data) => {
@@ -34,9 +34,6 @@ authRouter.post("/sign-in/teacher", (request, response) => {
     }
   );
 });
-
-authRouter.post("/sign-in/admin", authController.signin.admin);
-
 authRouter.get("/verify-access-token", (request, response) => {
   authController.verifyAccessToken(request.query.accessToken, (error, data) => {
     if (error) {
@@ -46,9 +43,23 @@ authRouter.get("/verify-access-token", (request, response) => {
     }
   });
 });
+authRouter.post("/sign-in/admin", authController.signIn.administrator);
 
-authRouter.get("/sign-out/student", (request, response) => {
-  authController.signOut.student((error) => {});
-});
+authRouter.post(
+  "/sign-in/administrator",
+  controllers.authController.signIn.administrator
+);
+authRouter.post("/sign-in/teacher", controllers.authController.signIn.teacher);
+authRouter.post(
+  "/sign-in/student",
+
+  controllers.authController.signIn.student
+);
+
+authRouter.post(
+  "/sign-out/administrator",
+  middlewares.verifyAccessToken,
+  controllers.authController.signOut.administrator
+);
 
 module.exports = authRouter;

@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 
 const resultSchema = new mongoose.Schema({
   student: {
-    type: String,
+    type: "String",
     ref: "Student",
     required: true,
   },
   school: {
-    type: String,
+    type: "String",
     required: true,
   },
   title: {
-    type: String,
+    type: "String",
     required: true,
   },
   class: {
@@ -20,32 +20,32 @@ const resultSchema = new mongoose.Schema({
     required: true,
   },
   session: {
-    type: String,
+    type: "String",
     required: true,
     lowercase: true,
   },
   term: {
-    type: String,
+    type: "String",
     required: true,
     lowercase: true,
   },
   scoreSheet: {
-    type: String,
+    type: "String",
     required: true,
   },
   overallGrade: {
-    type: String,
+    type: "String",
   },
   overallPercentage: {
-    type: Number,
+    type: "Number",
   },
   electives: [
     {
       title: {
-        type: String,
+        type: "String",
       },
       grade: {
-        type: String,
+        type: "String",
       },
     },
   ],
@@ -80,7 +80,12 @@ const resultSchema = new mongoose.Schema({
   },
   comments: {
     type: String,
-    default: "N/A",
+    default: "n/a",
+  },
+  isDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 });
 

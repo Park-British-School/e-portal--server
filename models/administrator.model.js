@@ -15,12 +15,14 @@ const administratorSchema = new mongoose.Schema(
       lowercase: true,
       enum: ["male", "female"],
       required: true,
+      default: "male",
     },
     maritalStatus: {
       type: String,
       lowercase: true,
-      enum: ["single", "married"],
+      enum: ["single", "married", "divorced"],
       required: true,
+      default: "single",
     },
     email: {
       type: String,
@@ -35,12 +37,31 @@ const administratorSchema = new mongoose.Schema(
       lowercase: true,
       default: "admin",
     },
+    secondaryRole: {
+      type: String,
+      lowercase: true,
+      required: true,
+      default: "administrator",
+    },
     homeAddress: {
       type: String,
     },
     status: {
       type: String,
       default: "active",
+    },
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isBanned: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    image: {
+      type: String,
     },
   },
   { collection: "admins" }

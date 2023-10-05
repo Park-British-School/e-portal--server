@@ -142,6 +142,51 @@ exports.findResultsByStudentID = async function (studentID, callback) {
   });
 };
 
+const metrics = async function (request, response) {
+  try {
+    let totalNumberOfResults = 0;
+    let totalNumberOfApprovedResults = 0;
+    let totalNumberOfUnapprovedResults = 0;
+    let totalNumberOfDeletedResults = 0;
+
+    totalNumberOfResults = parseInt(
+      await models.resultModel.countDocuments({ isDeleted: false })
+    );
+    totalNumberOfApprovedResults = parseInt(
+      await models.resultModel.countDocuments({
+        isDeleted: false,
+        isApproved: true,
+      })
+    );
+    totalNumberOfUnapprovedResults = parseInt(
+      await models.resultModel.countDocuments({
+        isDeleted: false,
+        isApproved: false,
+      })
+    );
+    totalNumberOfDeletedResults = parseInt(
+      await models.resultModel.countDocuments({ isDeleted: true })
+    );
+
+    return response.status(200).json({
+      message: "Success!",
+      statusCode: 200,
+      data: {
+        totalNumberOfUnapprovedResults,
+        totalNumberOfDeletedResults,
+        totalNumberOfResults,
+        totalNumberOfApprovedResults,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
 const upload = async function (request, response) {
   console.log("REQUEST BODY FOR RESULT", request.body);
   try {
@@ -292,6 +337,42 @@ const findAll = async function (request, response) {
   }
 };
 
+const find = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(
+      await models.resultModel.countDocuments({ ...request.body })
+    );
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const results = await models.resultModel
+      .find({ ...request.body }, {}, { limit: count, skip: (page - 1) * count })
+      .sort({ uploadedAt: -1 })
+      .populate(["class", "student"]);
+
+    return response.status(200).json({
+      data: {
+        results,
+        count: results.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
 const findOne = async function (request, response) {
   try {
     let result;
@@ -368,8 +449,10 @@ const deleteOne = async function (request, response) {
   }
 };
 
+exports.metrics = metrics;
 exports.search = search;
 exports.findAll = findAll;
+exports.find = find;
 exports.findOne = findOne;
 exports.updateOne = updateOne;
 exports.deleteOne = deleteOne;

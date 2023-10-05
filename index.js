@@ -28,7 +28,7 @@ const {
   announcementRouter,
 } = routers;
 
-const { invoiceModel, resultModel } = models;
+const { invoiceModel } = models;
 invoiceModel.default();
 
 const server = express();
@@ -54,8 +54,8 @@ server.use("/announcements", announcementRouter);
 server.use("/api/", express.static(__dirname));
 server.use("/api/administrators", routers.administratorRouter);
 server.use("/api/students", routers.studentRouter);
-server.use("/api/teachers", teacherRouter);
-server.use("/api/classes", classRouter);
+server.use("/api/teachers", routers.teacherRouter);
+server.use("/api/classes", routers.classRouter);
 server.use("/api/results", routers.resultRouter);
 server.use("/api/images", imageRouter);
 server.use("/api/term", termRouter);
@@ -65,6 +65,7 @@ server.use("/api/fees", feeRouter);
 server.use("/api/notifications", notificationRouter);
 server.use("/api/auth", authRouter);
 server.use("/api/announcements", announcementRouter);
+server.use("/api/variables", routers.variableRouter);
 
 server.get("/ping", (request, response) => {
   console.log("PING!!!");

@@ -2,9 +2,6 @@ const mongoose = require("mongoose");
 const models = require("../models");
 const bcrypt = require("bcrypt");
 const fs = require("fs");
-const path = require("path");
-const jsonwebtoken = require("jsonwebtoken");
-const classController = require("./class");
 
 const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
@@ -13,18 +10,36 @@ const { notificationModel, invoiceModel } = models;
 
 const metrics = async function (request, response) {
   try {
-    let numberOfStudents = 0;
-    let numberOfSuspendedStudents = 0;
+    let totalNumberOfStudents = 0;
+    let totalNumberOfSuspendedStudents = 0;
+    let totalNumberOfBannedStudents = 0;
+    let totalNumberOfArchivedStudents = 0;
+    let totalNumberOfDeletedStudents = 0;
 
-    numberOfStudents += parseInt(models.studentModel.countDocuments({}));
-    numberOfSuspendedStudents += parseInt(
-      models.studentModel.countDocuments({ status: "suspended" })
+    totalNumberOfStudents += parseInt(
+      await models.studentModel.countDocuments({ isDeleted: false })
+    );
+    totalNumberOfSuspendedStudents += parseInt(
+      await models.studentModel.countDocuments({ isSuspended: true })
+    );
+    totalNumberOfBannedStudents += parseInt(
+      await models.studentModel.countDocuments({ isBanned: true })
+    );
+    totalNumberOfArchivedStudents += parseInt(
+      await models.studentModel.countDocuments({ isArchived: true })
+    );
+    totalNumberOfDeletedStudents += parseInt(
+      await models.studentModel.countDocuments({ isDeleted: true })
     );
 
     return response.status(200).json({
+      message: "Success!",
       data: {
-        numberOfStudents,
-        numberOfSuspendedStudents,
+        totalNumberOfStudents,
+        totalNumberOfSuspendedStudents,
+        totalNumberOfArchivedStudents,
+        totalNumberOfBannedStudents,
+        totalNumberOfDeletedStudents,
       },
       statusCode: 200,
     });
@@ -43,12 +58,19 @@ const find = async function (request, response) {
     let totalNumberOfPages = 1;
 
     totalCount = parseInt(
-      await models.studentModel.countDocuments({ ...request.body })
+      await models.studentModel.countDocuments({
+        ...request.body,
+        isDeleted: false,
+      })
     );
     totalNumberOfPages = Math.ceil(totalCount / count);
 
     const students = await models.studentModel
-      .find({ ...request.body }, {}, { limit: count, skip: (page - 1) * count })
+      .find(
+        { ...request.body, isDeleted: false },
+        {},
+        { limit: count, skip: (page - 1) * count }
+      )
       .sort({ createdAt: -1 })
       .populate(["class", "results"]);
 
@@ -182,15 +204,28 @@ const search = async function (request, response) {
       request.query.search.trim() !== "" &&
       request.query.search.trim().length > 2
     ) {
-      students = await models.studentModel.find({
-        $or: [
-          { firstName: new RegExp(request.query.search, "i") },
-          { lastName: new RegExp(request.query.search, "i") },
-          { emailAddress: new RegExp(request.query.search, "i") },
-        ],
-      });
+      students = await models.studentModel
+        .find({
+          $or: [
+            {
+              firstName: new RegExp(request.query.search, "i"),
+              isDeleted: false,
+            },
+            {
+              lastName: new RegExp(request.query.search, "i"),
+              isDeleted: false,
+            },
+            {
+              emailAddress: new RegExp(request.query.search, "i"),
+              isDeleted: false,
+            },
+          ],
+        })
+        .populate(["class", "results"]);
     }
-
+    return response
+      .status(200)
+      .json({ message: "Success!", data: { students }, statusCode: 200 });
   } catch (error) {
     console.log(error.message);
     console.log(error.stack);
@@ -537,6 +572,50 @@ exports.invoices = {
   },
 };
 
+const activityLogs = {
+  findAll: async function (request, response) {
+    try {
+      let studentActivityLogs = [];
+      let count = parseInt(request.query.count) || 10;
+      let page = parseInt(request.query.page) || 1;
+      let totalCount = 0;
+      let totalNumberOfPages = 1;
+
+      totalCount = parseInt(
+        await models.studentActivityLogModel.countDocuments({})
+      );
+      totalNumberOfPages = Math.ceil(totalCount / count);
+
+      studentActivityLogs = await models.studentActivityLogModel
+        .find({}, {}, { limit: count, skip: (page - 1) * count })
+        .sort({ createdAt: -1 })
+        .populate(["student"]);
+
+      return response.status(200).json({
+        data: {
+          studentActivityLogs,
+          count: studentActivityLogs.length,
+          totalCount,
+          totalNumberOfPages,
+          page: page,
+        },
+        statusCode: 200,
+        error: false,
+        message: "Success!",
+      });
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response.status(400).json({
+        message: "Unable to process this request!",
+        statusCode: 400,
+        error: true,
+        data: null,
+      });
+    }
+  },
+};
+
 //REFACTORING ENDS HERE
 
 exports.metrics = metrics;
@@ -545,3 +624,4 @@ exports.search = search;
 exports.findAll = findAll;
 exports.findOne = findOne;
 exports.updateOne = updateOne;
+exports.activityLogs = activityLogs;

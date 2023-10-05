@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Class = require("../models/classModel");
 const Student = require("../models/studentModel");
 const Teacher = require("../models/teacherModel");
+const models = require("../models");
 
 exports.getAllClasses = async function (req, res) {
   try {
@@ -357,7 +358,7 @@ exports.students = {
 
 exports.teachers = {
   assign(classID, emailAddress, callback) {
-    console.log(emailAddress)
+    console.log(emailAddress);
     Teacher.findOne({ email: emailAddress }, (error, teacher) => {
       if (error) {
         callback(error);
@@ -474,4 +475,67 @@ exports.subjects = {
   },
 };
 
-//REFACTORING ENDS HERE
+const metrics = async function (request, response) {
+  try {
+    let totalNumberOfClasses = 0;
+    let totalNumberOfDeletedClasses;
+    totalNumberOfClasses = parseInt(
+      await models.classModel.countDocuments({ isDeleted: false })
+    );
+    totalNumberOfDeletedClasses = parseInt(
+      await models.classModel.countDocuments({ isDeleted: true })
+    );
+
+    return response
+      .status(200)
+      .json({
+        message: "Success!",
+        statusCode: 200,
+        data: { totalNumberOfDeletedClasses, totalNumberOfClasses },
+      });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
+const findAll = async function (request, response) {
+  try {
+    let count = parseInt(request.query.count) || 10;
+    let page = parseInt(request.query.page) || 1;
+    let totalCount = 0;
+    let totalNumberOfPages = 1;
+
+    totalCount = parseInt(await models.classModel.countDocuments({}));
+    totalNumberOfPages = Math.ceil(totalCount / count);
+
+    const classes = await models.classModel
+      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .populate(["students", "teachers"]);
+
+    return response.status(200).json({
+      data: {
+        classes,
+        count: classes.length,
+        totalCount,
+        totalNumberOfPages,
+        page: page,
+      },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response.status(400).json({
+      message: "Unable to process this request!",
+      statusCode: 400,
+      error: false,
+    });
+  }
+};
+
+exports.metrics = metrics;
+exports.findAll = findAll;

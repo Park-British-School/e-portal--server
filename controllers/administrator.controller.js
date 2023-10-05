@@ -1,22 +1,105 @@
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
-const jsonwebtoken = require("jsonwebtoken");
 const uid = require("uid");
 const models = require("../models");
 const utils = require("../utils");
 const services = require("../services");
+const { cloudinary } = require("../services");
 
-exports.createAdmin = async function (data, callback) {
-  const salt = await bcrypt.genSalt(3);
-  const hashedPassword = await bcrypt.hash(data.password, salt);
-  models.administratorModel
-    .create({ ...data, password: hashedPassword })
-    .then((document) => {
-      callback(null, document);
-    })
-    .catch((error) => {
-      callback(error, null);
+const metrics = async function (request, response) {
+  try {
+    let totalNumberOfAdministrators = 0;
+    let totalNumberOfBannedAdministrators = 0;
+    let totalNumberOfDeletedAdministrators = 0;
+
+    totalNumberOfAdministrators = parseInt(
+      await models.administratorModel.countDocuments({ isDeleted: false })
+    );
+
+    totalNumberOfBannedAdministrators = parseInt(
+      await models.administratorModel.countDocuments({
+        isDeleted: false,
+        isBanned: true,
+      })
+    );
+
+    totalNumberOfBannedAdministrators = parseInt(
+      await models.administratorModel.countDocuments({
+        isDeleted: true,
+      })
+    );
+
+    return response.status(200).json({
+      message: "Success!",
+      statusCode: 200,
+      data: {
+        totalNumberOfDeletedAdministrators,
+        totalNumberOfBannedAdministrators,
+        totalNumberOfAdministrators,
+      },
     });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+const create = async function (request, response) {
+  try {
+    let administrator;
+
+    administrator = await models.administratorModel.findOne({
+      email: request.body.emailAddress,
+      isDeleted: false,
+    });
+
+    if (administrator) {
+      return response.status(400).json({
+        message: "Administrator with this email address already exists!",
+        statusCode: 400,
+      });
+    }
+
+    //UPLOAD AVATAR
+    if (request.body.image) {
+      const result = await services.cloudinary.v2.uploader.upload(
+        `data:image/jpg;base64,${request.body.image}`,
+        {
+          folder: "uploads/administrators/images",
+        }
+      );
+      request.body.image = result.secure_url;
+    } else {
+      if (request.body.gender === "male") {
+        request.body.image =
+          "https://res.cloudinary.com/dpdlmetwd/image/upload/v1692557699/assets/images/undraw_male_avatar_g98d_xxrdqz.svg";
+      }
+      if (request.body.gender === "female") {
+        request.body.image =
+          "https://res.cloudinary.com/dpdlmetwd/image/upload/v1692557699/assets/images/undraw_female_avatar_efig_kvzx8p.svg";
+      }
+    }
+
+    const salt = await bcrypt.genSalt(3);
+    const hashedPassword = await bcrypt.hash(request.body.password, salt);
+    administrator = await models.administratorModel.create({
+      ...request.body,
+      password: hashedPassword,
+      email: request.body.emailAddress,
+    });
+
+    return response.status(200).json({
+      message: "Administrator created successfully!",
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
 };
 
 const findAll = async function (request, response) {
@@ -30,7 +113,11 @@ const findAll = async function (request, response) {
     totalNumberOfPages = Math.ceil(totalCount / count);
 
     const administrators = await models.administratorModel
-      .find({}, {}, { limit: count, skip: (page - 1) * count })
+      .find(
+        { isDeleted: false },
+        {},
+        { limit: count, skip: (page - 1) * count }
+      )
       .sort({ createdAt: -1 });
 
     return response.status(200).json({
@@ -348,7 +435,207 @@ exports.password = {
   },
 };
 
+const single = {
+  find: async function (request, response) {
+    try {
+      return response.status(200).json({
+        message: "Success!",
+        data: { administrator: request.payload.administrator },
+        statusCode: 200,
+      });
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+  update: async function (request, response) {
+    try {
+      switch (request.query.operation) {
+        case "update":
+          await models.administratorModel.updateOne(
+            { _id: request.query.id },
+            { $set: { ...request.body } }
+          );
+          return response.status(200).json({
+            message: "Administrator updated successfully!",
+            statusCode: 200,
+          });
+        case "update_image":
+          // CHECK FOR THE IMAGE ON THE REQUEST BODY
+          if (!request.body.image) {
+            return response.status(400).json({
+              message: "Please select image for upload!",
+              statusCode: 400,
+            });
+          }
+          // UPLOAD THE IMAGE
+          const result = await services.cloudinary.v2.uploader.upload(
+            `data:image/jpg;base64,${request.body.image}`,
+            {
+              folder: "uploads/administrators/images",
+            }
+          );
+          request.body.image = result.secure_url;
+          await models.administratorModel.updateOne(
+            { _id: request.payload.administrator._id },
+            {
+              $set: {
+                image: request.body.image,
+                updatedAt: new Date().getTime(),
+              },
+            }
+          );
+          return response.status(200).json({
+            message: "Image updated successfully!",
+            statusCode: 200,
+          });
+        default:
+          return response
+            .status(400)
+            .json({ message: "Unknown operation!", statusCode: 400 });
+      }
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+  ban: async function (request, response) {
+    try {
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+
+  unban: async function (request, response) {
+    try {
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+  delete: async function (request, response) {
+    try {
+      // ENSURE THAT THE ADMINISTRATOR MAKING THIS REQUEST IS THE SUPER_ADMINISTRATOR
+      // if (request.administrator.secondaryRole !== "super_administrator") {
+      //   return response.status(400).json({
+      //     message: "Access denied! This resource requires super administrator privileges.",
+      //     error: true,
+      //     statusCode: 400,
+      //   });
+      // }
+
+      //RESTRICT SUPER ADMINISTRATOR FROM BEING DELETED
+      if (
+        request.payload.administrator.secondaryRole === "super_administrator"
+      ) {
+        return response
+          .status(400)
+          .json({ message: "Super administrator cannot be deleted!" });
+      }
+
+      // DELETE THE ADMINISTRATOR
+      await models.administratorModel.updateOne(
+        { _id: request.payload.administrator._id },
+        { $set: { isDeleted: true } }
+      );
+
+      // LOG THE ACTIVITY
+      await models.administratorActivityLogModel.create({
+        type: "delete_administrator",
+        entity: request.payload.administrator._id,
+        administrator: request.administrator._id,
+      });
+
+      // RESPONSE
+      return response.status(200).json({
+        message: "Administrator deleted successfully!",
+        error: false,
+        statusCode: 200,
+      });
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+};
+
+const activityLogs = {
+  findAll: async function (request, response) {
+    try {
+      const count = parseInt(request.query.count) || 10;
+      const page = parseInt(request.query.page) || 1;
+      let totalCount = 0;
+      let totalNumberOfPages = 1;
+
+      totalCount = await models.administratorActivityLogModel.countDocuments(
+        {}
+      );
+      totalNumberOfPages = Math.ceil(totalCount / count);
+
+      const administratorActivityLogs =
+        await models.administratorActivityLogModel
+          .find({}, {}, { limit: count, skip: (page - 1) * count })
+          .sort({ createdAt: -1 })
+          .populate(["entity", "administrator"]);
+
+      return response.status(200).json({
+        data: {
+          count: administratorActivityLogs.length,
+          totalCount,
+          totalNumberOfPages,
+          page: page,
+          administratorActivityLogs,
+        },
+        statusCode: 200,
+        error: false,
+        message: "Success!",
+      });
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+  deleteAll: async function (request, response) {
+    try {
+      await models.administratorActivityLogModel.deleteMany({});
+      return response.status(200).json({
+        message: "Administrator activity logs deleted successfully!",
+        statusCode: 400,
+      });
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response
+        .status(400)
+        .json({ message: "Unable to process this request!", statusCode: 400 });
+    }
+  },
+};
+
+exports.metrics = metrics;
+exports.create = create;
 exports.findAll = findAll;
 exports.updateOne = updateOne;
 exports.deleteOne = deleteOne;
 exports.findOne = findOne;
+exports.activityLogs = activityLogs;
+exports.single = single;

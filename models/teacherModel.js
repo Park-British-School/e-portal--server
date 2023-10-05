@@ -23,6 +23,7 @@ const teacherSchema = new mongoose.Schema(
       required: true,
     },
     email: {
+      lowercase: true,
       type: String,
       required: true,
     },
@@ -51,9 +52,15 @@ const teacherSchema = new mongoose.Schema(
       type: Date,
       default: () => new Date().getTime(),
     },
-    lastSignInAt: {
-      type: Date,
-      default: () => new Date().getTime(),
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isBanned: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   {

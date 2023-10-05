@@ -147,9 +147,18 @@ router.get("/delete-one", (request, response) => {
   }
 });
 
+router.get("/metrics", controllers.teacherController.metrics);
 router.get("/find-all", controllers.teacherController.findAll);
 router.get("/find-one", controllers.teacherController.findOne);
 router.post("/update-one", controllers.teacherController.updateOne);
+router.get(
+  "/activity-logs/find-all",
+  controllers.teacherController.activityLogs.findAll
+);
+router.get(
+  "/activity-logs/delete-all",
+  controllers.teacherController.activityLogs.deleteAll
+);
 
 router.get("/:id", teacherController.getTeacher);
 

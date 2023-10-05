@@ -3,14 +3,16 @@ const controllers = require("../controllers");
 
 const { classController } = controllers;
 
+router.get("/metrics", controllers.classController.metrics);
+router.get("/find-all", controllers.classController.findAll);
+
 router.get("/", classController.getAllClasses);
 
 router.post("/addClass", classController.addClass);
+
 router.post("/assignstudent", classController.assignStudent);
 
 router.post("/assignteacher", classController.assignTeacher);
-
-// REFACTORING STARTS HERE
 
 router.get("/count-all", (request, response) => {
   classController.countAllClasses((error, count) => {
@@ -22,7 +24,7 @@ router.get("/count-all", (request, response) => {
   });
 });
 
-router.get("/find-all", (request, response) => {
+router.get("/find-all-deprecated", (request, response) => {
   classController.findAllClasses(
     {
       paginate: request.query.paginate === "true" ? true : false,
@@ -78,25 +80,6 @@ router.get("/find-one", (request, response) => {
     response.status(400).send("Incorrect query parameters");
   }
 });
-
-// router.get("/update-one", (request, response) => {
-//   if (request.query.by) {
-//     switch (request.query.by) {
-//       case "ID":
-//         classController.updateClassByID(request.query.ID, {
-//           action: request.query.action,
-//         });
-//         break;
-//       case "name":
-//         classController.updateClassByName;
-//         break;
-//       default:
-//         response.status(400).send("Incorrect query parameters");
-//     }
-//   } else {
-//     response.status(400).send("Incorrect query parameters");
-//   }
-// });
 
 router.get("/:classID/students/assign", (request, response) => {
   classController.students.assign(

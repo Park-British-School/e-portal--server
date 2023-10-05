@@ -308,6 +308,40 @@ exports.deleteTeacherByID = async function (ID, callback) {
   });
 };
 
+const metrics = async function (request, response) {
+  try {
+    let totalNumberOfTeachers = 0;
+    let totalNumberOfBannedTeachers = 0;
+    let totalNumberOfDeletedTeachers = 0;
+
+    totalNumberOfTeachers = parseInt(
+      await models.teacherModel.countDocuments({ isDeleted: false })
+    );
+    totalNumberOfBannedTeachers = parseInt(
+      await models.teacherModel.countDocuments({ isBanned: true })
+    );
+    totalNumberOfDeletedTeachers = parseInt(
+      await models.teacherModel.countDocuments({ isDeleted: true })
+    );
+
+    return response.status(200).json({
+      message: "Success!",
+      statusCode: 200,
+      data: {
+        totalNumberOfTeachers,
+        totalNumberOfBannedTeachers,
+        totalNumberOfDeletedTeachers,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response
+      .status(400)
+      .json({ message: "Unable to process this request!", statusCode: 400 });
+  }
+};
+
 const findAll = async function (request, response) {
   try {
     let teachers = [];
@@ -398,9 +432,20 @@ const updateOne = async function (request, response) {
           { _id: request.query.id },
           { $set: { status: "active", updatedAt: new Date().getTime() } }
         );
+
         return response
           .status(200)
           .json({ message: "Teacher unbanned successfully", statusCode: 200 });
+      case "update_password":
+        const salt = await bcrypt.genSalt(3);
+        const hashedPassword = await bcrypt.hash(request.body.password, salt);
+        await models.teacherModel.updateOne(
+          { _id: request.query.id },
+          { $set: { password: hashedPassword } }
+        );
+        return response
+          .status(200)
+          .json({ message: "Password updated successfully!", statusCode: 200 });
       default:
         return response
           .status(400)
@@ -415,6 +460,65 @@ const updateOne = async function (request, response) {
   }
 };
 
+const activityLogs = {
+  findAll: async function (request, response) {
+    try {
+      let teacherActivityLogs = [];
+      let count = parseInt(request.query.count) || 10;
+      let page = parseInt(request.query.page) || 1;
+      let totalCount = 0;
+      let totalNumberOfPages = 1;
+
+      totalCount = parseInt(
+        await models.teacherActivityLogModel.countDocuments({})
+      );
+      totalNumberOfPages = Math.ceil(totalCount / count);
+
+      teacherActivityLogs = await models.teacherActivityLogModel
+        .find({}, {}, { limit: count, skip: (page - 1) * count })
+        .sort({ createdAt: -1 })
+        .populate(["teacher"]);
+
+      return response.status(200).json({
+        data: {
+          teacherActivityLogs,
+          count: teacherActivityLogs.length,
+          totalCount,
+          totalNumberOfPages,
+          page: page,
+        },
+        statusCode: 200,
+        error: false,
+        message: "Success!",
+      });
+    } catch (error) {
+      console.log(error.stack);
+      console.log(error.message);
+      return response.status(400).json({
+        message: "Unable to process this request!",
+        error: true,
+        statusCode: 400,
+        data: null,
+      });
+    }
+  },
+  deleteAll: async function (request, response) {
+    try {
+    } catch (error) {
+      console.log(error.message);
+      console.log(error.stack);
+      return response.status(400).json({
+        message: "Unable to process this request!",
+        error: true,
+        statusCode: 400,
+        data: null,
+      });
+    }
+  },
+};
+
+exports.metrics = metrics;
 exports.findAll = findAll;
 exports.findOne = findOne;
 exports.updateOne = updateOne;
+exports.activityLogs = activityLogs;

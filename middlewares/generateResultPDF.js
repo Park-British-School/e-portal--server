@@ -156,6 +156,16 @@ function generateResultPDF(req, res, next) {
 
   row += 10;
 
+  let testRow0 = row;
+  testRow0 += 50;
+  result.teachersRemark.split("\n").forEach((p, index) => {
+    testRow0 += Math.ceil(p.length / 110) * 15;
+    testRow0 += 5;
+  });
+  if (testRow0 > 770) {
+    doc.addPage();
+    row = 50;
+  }
   doc
     .fontSize(11)
     .text("CLASS TEACHER'S REMARK", 70, row, { width: 300 })
@@ -165,13 +175,54 @@ function generateResultPDF(req, res, next) {
     .lineTo(545.28, row + 15)
     .stroke();
 
+  row += 20;
+
+  result.teachersRemark.split("\n").forEach((p, index) => {
+    doc.fontSize(11).text(p, 70, row);
+    row += Math.ceil(p.length / 110) * 15;
+    row += 5;
+  });
+
+  row += 20;
+
+  let testRow1 = row;
+  testRow1 += 50;
+  result.comments.split("\n").forEach((p, index) => {
+    testRow1 += Math.ceil(p.length / 110) * 15;
+    testRow1 += 5;
+  });
+  if (testRow1 > 770) {
+    doc.addPage();
+    row = 50;
+  }
+  doc
+    .fontSize(11)
+    .text("EXTRA CURRICULAR ACTIVITIES", 70, row, { width: 300 })
+    .lineCap("round")
+    .lineWidth(1)
+    .moveTo(50, row + 15)
+    .lineTo(545.28, row + 15)
+    .stroke();
+
   row += 25;
 
-  doc.fontSize(11).text(result.teachersRemark, 70, row);
+  result.comments.split("\n").forEach((p, index) => {
+    doc.fontSize(11).text(p, 70, row);
+    row += Math.ceil(p.length / 110) * 15;
+    row += 5;
+  });
+  row += 20;
 
-  row += Math.ceil(result.teachersRemark.length / 110) * 15;
-
-  row += 25;
+  let testRow = row;
+  testRow += 50;
+  result.principalsRemark.split("\n").forEach((p, index) => {
+    testRow += Math.ceil(p.length / 110) * 15;
+    testRow += 5;
+  });
+  if (testRow > 770) {
+    doc.addPage();
+    row = 50;
+  }
 
   doc
     .text("PRINCIPAL'S REMARK AND SIGNATURE", 70, row, { bold: true })
@@ -179,15 +230,21 @@ function generateResultPDF(req, res, next) {
     .lineWidth(1)
     .moveTo(50, row + 15)
     .lineTo(545.28, row + 15)
-    .stroke()
-    .fontSize(11)
-    .text(result.principalsRemark, 70, row + 20);
+    .stroke();
 
+  row += 25;
+
+  result.principalsRemark.split("\n").forEach((p, index) => {
+    doc.fontSize(11).text(p, 70, row);
+    row += Math.ceil(p.length / 110) * 15;
+    row += 5;
+  });
+  row += 20;
   if (result.isApproved) {
     doc
       .font("Helvetica-BoldOblique")
       .fontSize(13)
-      .text("AMA", 480, row + 115, { bold: true });
+      .text("AMA", 480, row, { bold: true });
   }
 
   doc.end();

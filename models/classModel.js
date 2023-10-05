@@ -25,6 +25,11 @@ const classSchema = new Schema({
       ref: "Student",
     },
   ],
+  isDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 // REFACTORING STARTS HERE

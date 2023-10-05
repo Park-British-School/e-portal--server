@@ -1,12 +1,12 @@
 const Term = require("../models/termModel");
+const models = require("../models");
 
 exports.getTerm = async function (req, res) {
-  const data = await Term.findOne({});
+  const data = await models.variableModel.findOne({ key: "term" });
   if (!data) {
-    await new Term({ name: "Not Set" }).save();
     res.status(200).json({ term: "Not Set" });
   } else {
-    res.status(200).json({ term: data.name });
+    res.status(200).json({ term: data.value });
   }
 };
 

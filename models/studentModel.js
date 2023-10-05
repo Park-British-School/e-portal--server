@@ -49,12 +49,6 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    results: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Result",
-      },
-    ],
     invoices: [
       {
         type: String,
@@ -69,9 +63,33 @@ const studentSchema = new mongoose.Schema(
       type: Date,
       default: () => new Date().getTime(),
     },
+    updatedAt: {
+      type: Date,
+      default: () => new Date().getTime(),
+    },
     lastSeen: {
       type: Date,
       default: () => new Date().getTime(),
+    },
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isBanned: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isSuspended: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isArchived: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   {
@@ -89,6 +107,11 @@ studentSchema.virtual("class", {
   justOne: true,
 });
 
+studentSchema.virtual("results", {
+  ref: "Result",
+  localField: "_id",
+  foreignField: "student",
+});
 // REFACTORING STARTS HERE
 studentSchema.static("findAll", function (callback) {
   return this.find({}, (error, documents) => {

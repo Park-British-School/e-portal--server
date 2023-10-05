@@ -5,6 +5,8 @@ const middlewares = require("../middlewares");
 const { resultController } = controllers;
 const { aggregateScores, generateResultPDF } = middlewares;
 
+router.get("/metrics", controllers.resultController.metrics);
+
 router.get("/search", controllers.resultController.search);
 router.post(
   "/upload",
@@ -12,6 +14,7 @@ router.post(
   controllers.resultController.upload
 );
 router.get("/find-all", controllers.resultController.findAll);
+router.post("/find", controllers.resultController.find);
 router.get("/find-one", controllers.resultController.findOne);
 router.get("/delete-one", controllers.resultController.deleteOne);
 router.post(

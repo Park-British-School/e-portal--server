@@ -25,6 +25,7 @@ router.get("/find-one", controllers.studentController.findOne);
 router.post("/update-one", controllers.studentController.updateOne);
 
 router.get("/search", controllers.studentController.search);
+router.get("/activity-logs/find-all", controllers.studentController.activityLogs.findAll)
 
 router.get("/find-one-deprecated", (request, response) => {
   if (request.query.by) {

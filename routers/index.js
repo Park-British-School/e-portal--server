@@ -1,7 +1,7 @@
-const studentRouter = require("./student");
-const teacherRouter = require("./teacher");
-const classRouter = require("./class");
-const resultRouter = require("./result");
+const studentRouter = require("./student.router");
+const teacherRouter = require("./teacher.router");
+const classRouter = require("./class.router");
+const resultRouter = require("./result.router");
 const imageRouter = require("./image");
 const administratorRouter = require("./administrator.router");
 const termRouter = require("./term");
@@ -9,8 +9,9 @@ const sessionRouter = require("./session");
 const invoiceRouter = require("./invoice");
 const feeRouter = require("./fee");
 const notificationRouter = require("./notification");
-const authRouter = require("./auth");
+const authRouter = require("./auth.router");
 const announcementRouter = require("./announcement");
+const variableRouter = require("./variable.router")
 
 module.exports = {
   studentRouter,
@@ -26,4 +27,5 @@ module.exports = {
   notificationRouter,
   authRouter,
   announcementRouter,
+  variableRouter
 };
