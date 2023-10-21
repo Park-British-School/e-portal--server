@@ -187,7 +187,7 @@ const signIn = {
       const teacher = await models.teacherModel.findOne({
         email: request.body.emailAddress,
         isDeleted: false,
-      });
+      }).populate(["class", "classes"])
       if (!teacher) {
         return response.status(400).json({
           message: "Invalid email address!",

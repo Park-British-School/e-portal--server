@@ -356,7 +356,7 @@ const findAll = async function (request, response) {
     teachers = await models.teacherModel
       .find({}, {}, { limit: count, skip: (page - 1) * count })
       .sort({ createdAt: -1 })
-      .populate(["class"]);
+      .populate(["class", "classes"]);
 
     return response.status(200).json({
       data: {

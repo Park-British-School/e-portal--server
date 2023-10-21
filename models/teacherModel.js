@@ -128,6 +128,12 @@ teacherSchema.virtual("class", {
   justOne: true,
 });
 
+teacherSchema.virtual("classes", {
+    ref: "Class",
+    foreignField: "teachers",
+    localField: "_id",
+});
+
 const Teacher = mongoose.model("Teacher", teacherSchema);
 
 module.exports = Teacher;
