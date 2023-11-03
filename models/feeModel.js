@@ -1,8 +1,8 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const { Schema, model } = mongoose
+const { Schema, model } = mongoose;
 
-const feeSchema = new Schema({})
+const feeSchema = new Schema({});
 
 const feeSchema__withPriceVariations = new Schema({
   title: { type: String },
@@ -10,40 +10,36 @@ const feeSchema__withPriceVariations = new Schema({
   prices: [
     {
       variant: { type: String, default: "N/A" },
-      price: { type: Number, default: 0 }
-    }
+      price: { type: Number, default: 0 },
+    },
   ],
   isGrouped: { type: Boolean, default: false },
-  groupName: { type: String, default: "" }
-})
+  groupName: { type: String, default: "" },
+});
 
 const feeSchema__withoutPriceVariations = new Schema({
   title: { type: String },
   hasPriceVariety: { type: Boolean, default: false },
   price: { type: Number, default: 0 },
   isGrouped: { type: Boolean, default: false },
-  groupName: { type: String, default: "" }
-})
+  groupName: { type: String, default: "" },
+});
 
-const FeeModel = model(
-  "Fee",
-  feeSchema,
-  'fees'
-)
+const FeeModel = model("Fee", feeSchema, "fees");
 
 const feeModel__withPriceVariations = model(
-  'Fee__withPriceVariations',
+  "Fee__withPriceVariations",
   feeSchema__withPriceVariations,
-  'fees'
-)
+  "fees"
+);
 const feeModel__withoutPriceVariations = model(
-  'Fee__withoutPriceVariations',
+  "Fee__withoutPriceVariations",
   feeSchema__withoutPriceVariations,
-  'fees'
-)
+  "fees"
+);
 
 module.exports = {
   feeModel__withoutPriceVariations,
   feeModel__withPriceVariations,
-  FeeModel
-}
+  FeeModel,
+};

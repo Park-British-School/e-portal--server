@@ -1,1 +1,1 @@
-exports.responseGenerator = require("./responseGenerator")
+exports.responseGenerator = require("./responseGenerator");

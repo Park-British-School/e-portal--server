@@ -616,6 +616,110 @@ const activityLogs = {
   },
 };
 
+const single = {
+  results: {
+    find: async function (request, response) {
+      try {
+        const filter = {
+          isBanned: (() => {
+            let value = null;
+            if (request.query.is_banned) {
+              if (
+                request.query.is_banned === "true" ||
+                request.query.is_banned === "false"
+              ) {
+                value = request.query.is_banned === "true" ? true : false;
+              }
+            }
+            return value;
+          })(),
+          isLocked: (() => {
+            let value = null;
+            if (request.query.is_locked) {
+              if (
+                request.query.is_locked === "true" ||
+                request.query.is_locked === "false"
+              ) {
+                value = request.query.is_locked === "true" ? true : false;
+              }
+            }
+            return value;
+          })(),
+          createdAt: (() => {
+            let value = null;
+            if (
+              request.query.created_at_start &&
+              request.query.created_at_end
+            ) {
+              const pattern = /^\d{4}-\d{2}-\d{2}$/;
+              let start;
+              let end;
+              if (pattern.test(request.query.created_at_start)) {
+                start = request.query.created_at_start.trim().split("-");
+                start = `${start[2]}-${start[1] - 1}-${start[0]}T00:00:00.000Z`;
+              }
+              if (pattern.test(request.query.created_at_end)) {
+                end = request.query.created_at_end.trim().split("-");
+                end = `${end[2]}-${end[1] - 1}-${end[0]}T00:00:00.000Z`;
+              }
+
+              if (start && end) {
+                value = { $gte: new Date(start), $lte: new Date(end) };
+              }
+            }
+            return value;
+          })(),
+        };
+        Object.keys(filter).forEach((key) => {
+          if (filter[key] === null) {
+            delete filter[key];
+          }
+        });
+
+        const count = parseInt(request.query.count) || 10;
+        const page = parseInt(request.query.page) || 1;
+        let totalCount = 0;
+        let totalNumberOfPages = 1;
+
+        totalCount = await models.result.countDocuments({
+          student: request.payload.student._id,
+        });
+        totalNumberOfPages = Math.ceil(totalCount / count);
+
+        const results = await models.result
+          .find(
+            { student: request.payload.student._id },
+            {},
+            { limit: count, skip: (page - 1) * count }
+          )
+          .sort({ createdAt: -1 })
+          .populate(["student", "class"]);
+        return response.status(200).json({
+          data: {
+            count: results.length,
+            totalCount: totalCount,
+            totalNumberOfPages: totalNumberOfPages,
+            page: page,
+            results: results,
+          },
+          message: "Success!",
+          error: false,
+          statusCode: 200,
+        });
+      } catch (error) {
+        console.log(error.message);
+        console.log(error.stack);
+        return response.status(400).json({
+          message: "Unable to process this request!",
+          error: true,
+          data: null,
+          statusCode: 400,
+        });
+      }
+    },
+  },
+};
+
 //REFACTORING ENDS HERE
 
 exports.metrics = metrics;
@@ -625,3 +729,4 @@ exports.findAll = findAll;
 exports.findOne = findOne;
 exports.updateOne = updateOne;
 exports.activityLogs = activityLogs;
+exports.single = single;

@@ -129,9 +129,9 @@ teacherSchema.virtual("class", {
 });
 
 teacherSchema.virtual("classes", {
-    ref: "Class",
-    foreignField: "teachers",
-    localField: "_id",
+  ref: "Class",
+  foreignField: "teachers",
+  localField: "_id",
 });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);

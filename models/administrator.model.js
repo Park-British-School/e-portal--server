@@ -63,6 +63,12 @@ const administratorSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    conversations: [
+      {
+        type: String,
+        ref: "Conversation",
+      },
+    ],
   },
   { collection: "admins" }
 );

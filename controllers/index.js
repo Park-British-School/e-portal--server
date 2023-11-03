@@ -11,6 +11,8 @@ const teacherController = require("./teacher");
 const authController = require("./auth.controller");
 const announcementController = require("./announcement");
 const variableController = require("./variable.controller");
+const conversation = require("./conversation.controller");
+const student = require("./student")
 
 module.exports = {
   invoiceController,
@@ -26,4 +28,6 @@ module.exports = {
   authController,
   announcementController,
   variableController,
+  conversation,
+  student
 };

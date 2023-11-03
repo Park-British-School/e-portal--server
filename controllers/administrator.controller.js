@@ -142,9 +142,11 @@ const findAll = async function (request, response) {
 const findOne = async function (request, response) {
   try {
     let administrator;
-    administrator = await models.administratorModel.findOne({
-      _id: request.query.id,
-    });
+    administrator = await models.administratorModel
+      .findOne({
+        _id: request.query.id,
+      })
+      .populate(["conversations"]);
     if (!administrator) {
       return response
         .status(400)

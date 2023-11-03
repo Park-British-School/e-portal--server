@@ -11,7 +11,8 @@ const feeRouter = require("./fee");
 const notificationRouter = require("./notification");
 const authRouter = require("./auth.router");
 const announcementRouter = require("./announcement");
-const variableRouter = require("./variable.router")
+const variableRouter = require("./variable.router");
+const conversation = require("./conversation.router");
 
 module.exports = {
   studentRouter,
@@ -27,5 +28,6 @@ module.exports = {
   notificationRouter,
   authRouter,
   announcementRouter,
-  variableRouter
+  variableRouter,
+  conversation,
 };

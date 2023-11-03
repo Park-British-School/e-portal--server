@@ -486,13 +486,11 @@ const metrics = async function (request, response) {
       await models.classModel.countDocuments({ isDeleted: true })
     );
 
-    return response
-      .status(200)
-      .json({
-        message: "Success!",
-        statusCode: 200,
-        data: { totalNumberOfDeletedClasses, totalNumberOfClasses },
-      });
+    return response.status(200).json({
+      message: "Success!",
+      statusCode: 200,
+      data: { totalNumberOfDeletedClasses, totalNumberOfClasses },
+    });
   } catch (error) {
     console.log(error.message);
     console.log(error.stack);

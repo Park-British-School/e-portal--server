@@ -20,7 +20,9 @@ const teacherActivityLogSchema = new mongoose.Schema(
   { typeKey: "$type", collection: "teacher_activity_logs" }
 );
 
+const teacherActivityLogModel = mongoose.model(
+  "TeacherActivityLog",
+  teacherActivityLogSchema
+);
 
-const teacherActivityLogModel = mongoose.model("TeacherActivityLog", teacherActivityLogSchema)
-
-module.exports = teacherActivityLogModel
+module.exports = teacherActivityLogModel;

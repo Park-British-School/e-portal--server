@@ -8,10 +8,13 @@ const passwordResetPinModel = require("./passwordResetPin.model");
 const teacherModel = require("./teacherModel");
 const classModel = require("./classModel");
 const administratorActivityLogModel = require("./administratorActivityLog.model");
-const studentActivityLogModel = require("./studentActivityLog.model")
+const studentActivityLogModel = require("./studentActivityLog.model");
 const teacherActivityLogModel = require("./teacherActivityLog.model");
 const sessionModel = require("./session.model");
 const variableModel = require("./variable.model");
+const conversation = require("./conversation.model");
+const student = require("./studentModel");
+const result = require("./result.model")
 
 module.exports = {
   invoiceModel,
@@ -27,5 +30,8 @@ module.exports = {
   sessionModel,
   variableModel,
   teacherActivityLogModel,
-  studentActivityLogModel
+  studentActivityLogModel,
+  conversation,
+  student,
+  result
 };

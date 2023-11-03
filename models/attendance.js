@@ -1,26 +1,26 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const { Schema, model } = mongoose
+const { Schema, model } = mongoose;
 
 const attendanceSchema = new Schema(
   {
     class: {
       type: String,
-      required: true
+      required: true,
     },
     term: {
       type: String,
-      required: true
+      required: true,
     },
     session: {
       type: String,
-      required: true
+      required: true,
     },
     presentStudents: [
       {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     ],
     absentStudents: [
       {
@@ -29,59 +29,55 @@ const attendanceSchema = new Schema(
         },
         reason: {
           type: String,
-        }
-      }
+        },
+      },
     ],
     uploadedAt: {
       type: Date,
-      default: new Date().getTime()
+      default: new Date().getTime(),
     },
     uploadedBy: {
       type: String,
-      ref: "Staff"
+      ref: "Staff",
     },
-    populatedFields: {}
+    populatedFields: {},
   },
   {
-    collection: 'attendances',
+    collection: "attendances",
     minimize: false,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
-)
+);
 
-attendanceSchema.static('findAll', function (options, callback) {
-  this.find(
-    {},
-    (error, document) => {
-      callback(error, document)
-    }
-  ).populate([
-    'populatedFields.presentStudents',
-    'populatedFields.absentStudents.students',
-    'populatedFields.uploadedBy'
-  ])
-})
+attendanceSchema.static("findAll", function (options, callback) {
+  this.find({}, (error, document) => {
+    callback(error, document);
+  }).populate([
+    "populatedFields.presentStudents",
+    "populatedFields.absentStudents.students",
+    "populatedFields.uploadedBy",
+  ]);
+});
 
-attendanceSchema.virtual('populatedFields.presentStudents', {
+attendanceSchema.virtual("populatedFields.presentStudents", {
   ref: "Student",
   localField: "presentStudents",
-  foreignField: "id"
-})
+  foreignField: "id",
+});
 
-attendanceSchema.virtual('populatedFields.absentStudents.students', {
+attendanceSchema.virtual("populatedFields.absentStudents.students", {
   ref: "Student",
   localField: "absentStudents.students",
-  foreignField: "id"
-})
+  foreignField: "id",
+});
 
-
-attendanceSchema.virtual('populatedFields.uploadedBy', {
+attendanceSchema.virtual("populatedFields.uploadedBy", {
   ref: "Staff",
   localField: "uploadedBy",
-  foreignField: "id"
-})
+  foreignField: "id",
+});
 
-const attendanceModel = model('Attendance', attendanceSchema)
+const attendanceModel = model("Attendance", attendanceSchema);
 
-module.exports = attendanceModel
+module.exports = attendanceModel;

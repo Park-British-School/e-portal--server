@@ -1,7 +1,12 @@
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
+var __commonJS = (cb, mod) =>
+  function __require() {
+    return (
+      mod ||
+        (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod),
+      mod.exports
+    );
+  };
 
 // models/invoiceModel.js
 var require_invoiceModel = __commonJS({
@@ -13,8 +18,8 @@ var require_invoiceModel = __commonJS({
       subTitle: { type: String },
       amount: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     });
     var invoiceSchema = {
       default: new mongoose2.Schema(
@@ -23,25 +28,25 @@ var require_invoiceModel = __commonJS({
           type: {
             type: String,
             required: true,
-            default: "DEFAULT"
+            default: "DEFAULT",
           },
           issuedTo: {
             type: String,
             required: true,
-            ref: "Student"
+            ref: "Student",
           },
           issuedAt: {
             type: Date,
-            default: (/* @__PURE__ */ new Date()).getTime()
+            default: /* @__PURE__ */ new Date().getTime(),
           },
           status: {
             type: String,
             default: "Unpaid",
             enum: {
               values: ["Unpaid", "Paid", "Overdue", "PartPayment"],
-              message: "{VALUE} is not a valid option for status"
-            }
-          }
+              message: "{VALUE} is not a valid option for status",
+            },
+          },
         },
         { collection: "invoices" }
       ),
@@ -49,7 +54,7 @@ var require_invoiceModel = __commonJS({
         {
           fees: [feeSchema],
           type: { type: String, default: "TEMPLATE" },
-          title: { type: String, required: true }
+          title: { type: String, required: true },
         },
         { collection: "invoices" }
       ),
@@ -59,26 +64,26 @@ var require_invoiceModel = __commonJS({
           type: { type: String, default: "DRAFT" },
           issuedTo: {
             type: String,
-            ref: "Student"
+            ref: "Student",
           },
           status: {
             type: String,
             default: "Unpaid",
             enum: {
               values: ["Unpaid", "Paid", "Overdue", "PartPayment"],
-              message: "{VALUE} is not a valid option for status"
-            }
-          }
+              message: "{VALUE} is not a valid option for status",
+            },
+          },
         },
         { collection: "invoices" }
-      )
+      ),
     };
     module2.exports = {
       default: mongoose2.model("INVOICE_DEFAULT", invoiceSchema.default),
       template: mongoose2.model("INVOICE_TEMPLATE", invoiceSchema.template),
-      draft: mongoose2.model("INVOICE_DRAFT", invoiceSchema.draft)
+      draft: mongoose2.model("INVOICE_DRAFT", invoiceSchema.draft),
     };
-  }
+  },
 });
 
 // models/notification.js
@@ -90,20 +95,20 @@ var require_notification = __commonJS({
       recipient: {
         type: String,
         ref: "Student",
-        required: true
+        required: true,
       },
       type: {
         type: String,
-        default: "NEW_INVOICE"
+        default: "NEW_INVOICE",
       },
       invoiceID: {
         type: String,
-        required: true
+        required: true,
       },
       isRead: {
         type: Boolean,
-        default: false
-      }
+        default: false,
+      },
     });
     var newInvoiceNotificationModel = model(
       "NewInvoiceNotification",
@@ -114,12 +119,12 @@ var require_notification = __commonJS({
       recipient: {
         type: String,
         ref: "Student",
-        required: true
+        required: true,
       },
       type: {
         type: String,
-        default: "NEW_MESSAGE"
-      }
+        default: "NEW_MESSAGE",
+      },
     });
     var newMessageNotificationModel = model(
       "NewMessageNotification",
@@ -127,7 +132,7 @@ var require_notification = __commonJS({
       "notifications"
     );
     var notificationModel = model("Notification", {}, "notifications");
-    module2.exports = function(type) {
+    module2.exports = function (type) {
       switch (type) {
         case "NEW_INVOICE":
           return newInvoiceNotificationModel;
@@ -137,7 +142,7 @@ var require_notification = __commonJS({
           return notificationModel;
       }
     };
-  }
+  },
 });
 
 // models/announcement.js
@@ -149,44 +154,44 @@ var require_announcement = __commonJS({
       {
         title: {
           type: String,
-          required: true
+          required: true,
         },
         message: {
           type: String,
-          required: true
+          required: true,
         },
         privacy: {
           type: String,
           required: true,
           enum: ["general", "class", "teacher", "student", "admin"],
-          default: "general"
+          default: "general",
         },
         createdBy: {
           id: {
-            type: String
+            type: String,
           },
           role: {
-            type: String
-          }
+            type: String,
+          },
         },
         isHidden: {
           type: String,
-          default: false
+          default: false,
         },
         createdAt: {
           type: Date,
-          default: (/* @__PURE__ */ new Date()).getTime()
+          default: /* @__PURE__ */ new Date().getTime(),
         },
-        populatedFields: {}
+        populatedFields: {},
       },
       {
         collection: "announcements",
         minimize: false,
         toJSON: { virtuals: true },
-        toObject: { virtuals: true }
+        toObject: { virtuals: true },
       }
     );
-    announcementSchema.static("findAll", function(options, callback2) {
+    announcementSchema.static("findAll", function (options, callback2) {
       this.find({}, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -200,20 +205,20 @@ var require_announcement = __commonJS({
         ref: item,
         foreignField: "id",
         localField: "createdBy.id",
-        justOne: true
+        justOne: true,
       });
     });
     announcementSchema.virtual("populatedFields.class", {
       ref: "Class",
       foreignField: "_id",
       localField: "class",
-      justOne: true
+      justOne: true,
     });
     module2.exports = (options) => {
       if (options) {
         if (options.visibility === "class") {
           announcementSchema.add({
-            class: { type: String, required: true }
+            class: { type: String, required: true },
           });
         } else {
           announcementSchema.remove("class");
@@ -221,7 +226,7 @@ var require_announcement = __commonJS({
       }
       return model("Announcement", announcementSchema);
     };
-  }
+  },
 });
 
 // models/studentModel.js
@@ -235,76 +240,76 @@ var require_studentModel = __commonJS({
           unique: true,
           lowercase: true,
           trim: true,
-          required: true
+          required: true,
         },
         firstName: {
           type: String,
           lowercase: true,
           trim: true,
-          required: true
+          required: true,
         },
         lastName: {
           type: String,
           lowercase: true,
           trim: true,
-          required: true
+          required: true,
         },
         emailAddress: {
           type: String,
           lowercase: true,
-          trim: true
+          trim: true,
         },
         phoneNumber: {
           type: String,
-          trim: true
+          trim: true,
         },
         gender: {
           type: String,
           lowercase: true,
           enum: ["male", "female"],
-          required: true
+          required: true,
         },
         password: {
           type: String,
-          required: true
+          required: true,
         },
         role: {
           type: String,
           lowercase: true,
-          default: "student"
+          default: "student",
         },
         address: {
           type: String,
-          required: true
+          required: true,
         },
         results: [
           {
             type: mongoose2.Types.ObjectId,
-            ref: "Result"
-          }
+            ref: "Result",
+          },
         ],
         invoices: [
           {
             type: String,
-            ref: "INVOICE_DEFAULT"
-          }
+            ref: "INVOICE_DEFAULT",
+          },
         ],
         status: {
           type: String,
-          default: "active"
+          default: "active",
         },
         createdAt: {
           type: Date,
-          default: () => (/* @__PURE__ */ new Date()).getTime()
+          default: () => /* @__PURE__ */ new Date().getTime(),
         },
         lastSeen: {
           type: Date,
-          default: () => (/* @__PURE__ */ new Date()).getTime()
-        }
+          default: () => /* @__PURE__ */ new Date().getTime(),
+        },
       },
       { collection: "students", minimize: false }
     );
-    studentSchema.static("findAll", function(callback2) {
+    studentSchema.static("findAll", function (callback2) {
       return this.find({}, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -313,23 +318,25 @@ var require_studentModel = __commonJS({
         }
       });
     });
-    studentSchema.static("findByID", function(ID2, callback2) {
-      return this.find({ _id: ID2 }).populate(["results", "invoices"]).exec((error, documents) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          if (documents.length === 0) {
-            callback2(null, null);
+    studentSchema.static("findByID", function (ID2, callback2) {
+      return this.find({ _id: ID2 })
+        .populate(["results", "invoices"])
+        .exec((error, documents) => {
+          if (error) {
+            callback2(error, null);
           } else {
-            callback2(null, documents[0]);
+            if (documents.length === 0) {
+              callback2(null, null);
+            } else {
+              callback2(null, documents[0]);
+            }
           }
-        }
-      });
+        });
     });
-    studentSchema.static("findByName", function(name, callback2) {
+    studentSchema.static("findByName", function (name, callback2) {
       return this.find(
         {
-          $or: [{ firstName: name }, { lastName: name }]
+          $or: [{ firstName: name }, { lastName: name }],
         },
         (error, documents) => {
           if (error) {
@@ -340,13 +347,13 @@ var require_studentModel = __commonJS({
         }
       );
     });
-    studentSchema.static("findBySearch", function(search, callback2) {
+    studentSchema.static("findBySearch", function (search, callback2) {
       return this.find(
         {
           $or: [
             { firstName: new RegExp(search, "i") },
-            { lastName: new RegExp(search, "i") }
-          ]
+            { lastName: new RegExp(search, "i") },
+          ],
         },
         (error, documents) => {
           if (error) {
@@ -359,7 +366,7 @@ var require_studentModel = __commonJS({
     });
     var Student = mongoose2.model("Student", studentSchema);
     module2.exports = Student;
-  }
+  },
 });
 
 // models/adminModel.js
@@ -369,42 +376,42 @@ var require_adminModel = __commonJS({
     var adminSchema = new mongoose2.Schema({
       firstName: {
         type: String,
-        required: true
+        required: true,
       },
       lastName: {
         type: String,
-        required: true
+        required: true,
       },
       gender: {
         type: String,
         lowercase: true,
         enum: ["male", "female"],
-        required: true
+        required: true,
       },
       maritalStatus: {
         type: String,
         lowercase: true,
         enum: ["single", "married"],
-        required: true
+        required: true,
       },
       email: {
         type: String,
-        required: true
+        required: true,
       },
       password: {
         type: String,
-        required: true
+        required: true,
       },
       role: {
         type: String,
         lowercase: true,
-        default: "admin"
+        default: "admin",
       },
       address: {
-        type: String
-      }
+        type: String,
+      },
     });
-    adminSchema.static("findAll", function(callback2) {
+    adminSchema.static("findAll", function (callback2) {
       return this.find().exec((error, documents) => {
         if (error) {
           callback2(error, null);
@@ -413,7 +420,7 @@ var require_adminModel = __commonJS({
         }
       });
     });
-    adminSchema.static("findByEmailAddress", function(email, callback2) {
+    adminSchema.static("findByEmailAddress", function (email, callback2) {
       return this.find({ email }, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -424,7 +431,7 @@ var require_adminModel = __commonJS({
     });
     var Admin = mongoose2.model("Admin", adminSchema);
     module2.exports = Admin;
-  }
+  },
 });
 
 // models/resultModel.js
@@ -435,96 +442,98 @@ var require_resultModel = __commonJS({
       student: {
         type: String,
         ref: "Student",
-        required: true
+        required: true,
       },
       school: {
         type: String,
-        required: true
+        required: true,
       },
       title: {
         type: String,
-        required: true
+        required: true,
       },
       class: {
         type: mongoose2.Types.ObjectId,
         ref: "Class",
-        required: true
+        required: true,
       },
       session: {
         type: String,
         required: true,
-        lowercase: true
+        lowercase: true,
       },
       term: {
         type: String,
         required: true,
-        lowercase: true
+        lowercase: true,
       },
       scoreSheet: {
         type: String,
-        required: true
+        required: true,
       },
       overallGrade: {
-        type: String
+        type: String,
       },
       overallPercentage: {
-        type: Number
+        type: Number,
       },
       electives: [
         {
           title: {
-            type: String
+            type: String,
           },
           grade: {
-            type: String
-          }
-        }
+            type: String,
+          },
+        },
       ],
       teachersRemark: {
         type: String,
-        required: true
+        required: true,
       },
       principalsRemark: {
-        type: String
+        type: String,
       },
       resumptionDate: {
-        type: String
+        type: String,
       },
       gradingScale: {
-        type: String
+        type: String,
       },
       uploadedAt: {
         type: Date,
-        default: () => (/* @__PURE__ */ new Date()).getTime()
+        default: () => /* @__PURE__ */ new Date().getTime(),
       },
       isApproved: {
         type: Boolean,
         required: true,
-        default: false
+        default: false,
       },
       type: {
         type: String,
-        required: true
+        required: true,
       },
       comments: {
         type: String,
-        default: "N/A"
-      }
+        default: "N/A",
+      },
     });
-    resultSchema.static("findAll", function(callback2) {
-      return this.find().populate([
-        { path: "class", select: "-image -password" },
-        { path: "student", select: "-image -password" },
-        { path: "uploadedBy", select: "-image -password" }
-      ]).exec((error, documents) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, documents);
-        }
-      });
+    resultSchema.static("findAll", function (callback2) {
+      return this.find()
+        .populate([
+          { path: "class", select: "-image -password" },
+          { path: "student", select: "-image -password" },
+          { path: "uploadedBy", select: "-image -password" },
+        ])
+        .exec((error, documents) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, documents);
+          }
+        });
     });
-    resultSchema.static("findByID", function(ID2, callback2) {
+    resultSchema.static("findByID", function (ID2, callback2) {
       return this.find({ _id: ID2 }, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -539,7 +548,7 @@ var require_resultModel = __commonJS({
     });
     var Result = mongoose2.model("Result", resultSchema);
     module2.exports = Result;
-  }
+  },
 });
 
 // models/index.js
@@ -557,9 +566,9 @@ var require_models = __commonJS({
       announcementModel,
       studentModel,
       administratorModel,
-      resultModel: resultModel2
+      resultModel: resultModel2,
     };
-  }
+  },
 });
 
 // models/classModel.js
@@ -571,27 +580,27 @@ var require_classModel = __commonJS({
       name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
       },
       teachers: [
         {
           type: mongoose2.Schema.Types.ObjectId,
-          ref: "Teacher"
-        }
+          ref: "Teacher",
+        },
       ],
       subjects: [
         {
-          type: String
-        }
+          type: String,
+        },
       ],
       students: [
         {
           type: String,
-          ref: "Student"
-        }
-      ]
+          ref: "Student",
+        },
+      ],
     });
-    classSchema.static("findAll", function(callback2) {
+    classSchema.static("findAll", function (callback2) {
       return this.find({}, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -602,7 +611,7 @@ var require_classModel = __commonJS({
     });
     var Class = model("Class", classSchema);
     module2.exports = Class;
-  }
+  },
 });
 
 // models/teacherModel.js
@@ -612,55 +621,55 @@ var require_teacherModel = __commonJS({
     var teacherSchema = new mongoose2.Schema({
       firstName: {
         type: String,
-        required: true
+        required: true,
       },
       lastName: {
         type: String,
-        required: true
+        required: true,
       },
       gender: {
         type: String,
         lowercase: true,
         enum: ["male", "female"],
-        required: true
+        required: true,
       },
       maritalStatus: {
         type: String,
         lowercase: true,
         enum: ["single", "married"],
-        required: true
+        required: true,
       },
       email: {
         type: String,
-        required: true
+        required: true,
       },
       password: {
         type: String,
-        required: true
+        required: true,
       },
       role: {
         type: String,
         lowercase: true,
-        default: "teacher"
+        default: "teacher",
       },
       address: {
         type: String,
-        required: true
+        required: true,
       },
       status: {
         type: String,
-        default: "active"
+        default: "active",
       },
       createdAt: {
         type: Date,
-        default: () => (/* @__PURE__ */ new Date()).getTime()
+        default: () => /* @__PURE__ */ new Date().getTime(),
       },
       lastSeen: {
         type: Date,
-        default: () => (/* @__PURE__ */ new Date()).getTime()
-      }
+        default: () => /* @__PURE__ */ new Date().getTime(),
+      },
     });
-    teacherSchema.static("findAll", function(callback2) {
+    teacherSchema.static("findAll", function (callback2) {
       return this.find({}, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -669,7 +678,7 @@ var require_teacherModel = __commonJS({
         }
       });
     });
-    teacherSchema.static("findByID", function(ID2, callback2) {
+    teacherSchema.static("findByID", function (ID2, callback2) {
       return this.find({ _id: ID2 }, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -682,10 +691,10 @@ var require_teacherModel = __commonJS({
         }
       });
     });
-    teacherSchema.static("findByName", function(name, callback2) {
+    teacherSchema.static("findByName", function (name, callback2) {
       return this.find(
         {
-          $or: [{ firstName: name }, { lastName: name }]
+          $or: [{ firstName: name }, { lastName: name }],
         },
         (error, documents) => {
           if (error) {
@@ -696,7 +705,7 @@ var require_teacherModel = __commonJS({
         }
       );
     });
-    teacherSchema.static("findByEmailAddress", function(email, callback2) {
+    teacherSchema.static("findByEmailAddress", function (email, callback2) {
       return this.find({ email }, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -707,7 +716,7 @@ var require_teacherModel = __commonJS({
     });
     var Teacher = mongoose2.model("Teacher", teacherSchema);
     module2.exports = Teacher;
-  }
+  },
 });
 
 // controllers/class.js
@@ -717,27 +726,31 @@ var require_class = __commonJS({
     var Class = require_classModel();
     var Student = require_studentModel();
     var Teacher = require_teacherModel();
-    exports.getAllClasses = async function(req, res2) {
+    exports.getAllClasses = async function (req, res2) {
       try {
-        const classes = await Class.find({}).populate([
-          { path: "students", select: "-image -password" },
-          { path: "teachers", select: "-image -password" }
-        ]).exec();
+        const classes = await Class.find({})
+          .populate([
+            { path: "students", select: "-image -password" },
+            { path: "teachers", select: "-image -password" },
+          ])
+          .exec();
         res2.status(200).json(classes);
       } catch (err) {
         res2.status(404).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
-    exports.getClass = async function(req, res2) {
+    exports.getClass = async function (req, res2) {
       try {
-        const _class = await Class.findOne({ _id: req.params.classID }).populate([
-          { path: "students", select: "-image -password" },
-          { path: "teachers", select: "-image -password" }
-        ]).exec();
+        const _class = await Class.findOne({ _id: req.params.classID })
+          .populate([
+            { path: "students", select: "-image -password" },
+            { path: "teachers", select: "-image -password" },
+          ])
+          .exec();
         if (_class) {
           res2.status(200).json(_class);
         } else {
@@ -746,18 +759,18 @@ var require_class = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
     exports.addClass = async (req, res2) => {
       const newClass = await new Class({
-        ...req.body
+        ...req.body,
       }).save();
       res2.json(newClass);
     };
-    exports.assignStudent = async function(req, res2) {
+    exports.assignStudent = async function (req, res2) {
       const studentID2 = req.body.studentID;
       const classID = req.body.classID;
       try {
@@ -779,12 +792,12 @@ var require_class = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.removeStudent = async function(req, res2) {
+    exports.removeStudent = async function (req, res2) {
       const studentID2 = req.body.studentID;
       const classID = req.params.classID;
       try {
@@ -806,12 +819,12 @@ var require_class = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.assignTeacher = async function(req, res2) {
+    exports.assignTeacher = async function (req, res2) {
       const teacherID = req.body.teacherID;
       const classID = req.body.classID;
       try {
@@ -828,12 +841,12 @@ var require_class = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.removeTeacher = async function(req, res2) {
+    exports.removeTeacher = async function (req, res2) {
       const teacherID = req.body.teacherID;
       const classID = req.params.classID;
       try {
@@ -855,14 +868,13 @@ var require_class = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.getAllSubjects = async function(req, res2) {
-    };
-    exports.addSubject = async function(req, res2) {
+    exports.getAllSubjects = async function (req, res2) {};
+    exports.addSubject = async function (req, res2) {
       const subject = req.body.subject;
       console.log(subject);
       const classID = req.params.classID;
@@ -886,12 +898,12 @@ var require_class = __commonJS({
         console.log(error);
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.deleteSubject = async function(req, res2) {
+    exports.deleteSubject = async function (req, res2) {
       const subject = req.body.subject;
       const classID = req.params.classID;
       try {
@@ -912,12 +924,12 @@ var require_class = __commonJS({
         console.log(error);
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.countAllClasses = async function(callback2) {
+    exports.countAllClasses = async function (callback2) {
       Class.countDocuments({}, (error, count) => {
         if (error) {
           callback2(error, null);
@@ -926,15 +938,18 @@ var require_class = __commonJS({
         }
       });
     };
-    exports.findAllClasses = async function(options, callback2) {
+    exports.findAllClasses = async function (options, callback2) {
       if (options.paginate) {
-        Class.find().limit(options.count).skip(options.count * (options.page - 1)).exec((error, classes) => {
-          if (error) {
-            callback2(error, null);
-          } else {
-            callback2(null, classes);
-          }
-        });
+        Class.find()
+          .limit(options.count)
+          .skip(options.count * (options.page - 1))
+          .exec((error, classes) => {
+            if (error) {
+              callback2(error, null);
+            } else {
+              callback2(null, classes);
+            }
+          });
       }
       Class.findAll((error, document2) => {
         if (error) {
@@ -944,30 +959,36 @@ var require_class = __commonJS({
         }
       });
     };
-    exports.findClassByID = async function(ID2, callback2) {
-      Class.find({ _id: ID2 }).populate(["students", "teachers"]).exec((error, documents) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, documents[0]);
-        }
-      });
+    exports.findClassByID = async function (ID2, callback2) {
+      Class.find({ _id: ID2 })
+        .populate(["students", "teachers"])
+        .exec((error, documents) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, documents[0]);
+          }
+        });
     };
-    exports.findClassByName = async function(name, callback2) {
-      Class.find({ name }).populate(["students", "teachers"]).exec((error, documents) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, documents[0]);
-        }
-      });
+    exports.findClassByName = async function (name, callback2) {
+      Class.find({ name })
+        .populate(["students", "teachers"])
+        .exec((error, documents) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, documents[0]);
+          }
+        });
     };
-    exports.createClass = async function(data2, callback2) {
-      Class.create({ ...data2 }).then((document2) => {
-        callback2(null, document2);
-      }).catch((error) => {
-        callback2(error, null);
-      });
+    exports.createClass = async function (data2, callback2) {
+      Class.create({ ...data2 })
+        .then((document2) => {
+          callback2(null, document2);
+        })
+        .catch((error) => {
+          callback2(error, null);
+        });
     };
     exports.students = {
       assign(classID, studentID2, callback2) {
@@ -1035,7 +1056,7 @@ var require_class = __commonJS({
             }
           }
         });
-      }
+      },
     };
     exports.teachers = {
       assign(classID, emailAddress, callback2) {
@@ -1104,7 +1125,7 @@ var require_class = __commonJS({
             }
           }
         });
-      }
+      },
     };
     exports.subjects = {
       add(classID, subject, callback2) {
@@ -1152,9 +1173,9 @@ var require_class = __commonJS({
             callback2("Class does not exist!");
           }
         });
-      }
+      },
     };
-  }
+  },
 });
 
 // controllers/student.js
@@ -1171,19 +1192,19 @@ var require_student = __commonJS({
     var Class = require_classModel();
     var Result = require_resultModel();
     var { notificationModel, invoiceModel: invoiceModel2 } = models2;
-    exports.findAllStudents = async function(req, res2) {
+    exports.findAllStudents = async function (req, res2) {
       const student = await Student.find({}).populate("class");
       res2.json(student);
     };
-    exports.getStudent = async function(req, res2) {
+    exports.getStudent = async function (req, res2) {
       const studentID2 = req.params.studentID.replace(/-/g, "/");
       const student = await Student.findById(studentID2).populate([
         "class",
-        "results"
+        "results",
       ]);
       res2.status(200).json(student);
     };
-    exports.addStudent = async function(req, res2) {
+    exports.addStudent = async function (req, res2) {
       try {
         const salt = await bcrypt.genSalt(3);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -1195,7 +1216,7 @@ var require_student = __commonJS({
           phoneNumber: req.body.phoneNumber,
           gender: req.body.gender,
           address: req.body.address,
-          password: hashedPassword
+          password: hashedPassword,
         }).save();
         if (req.body.class) {
           const isValid = mongoose2.Types.ObjectId.isValid(req.body.class);
@@ -1210,7 +1231,9 @@ var require_student = __commonJS({
         }
         if (req.body.image) {
           fs.writeFile(
-            `${__dirname}/../uploads/images/profile/${newStudent._id.toString().replace(/\//g, "-")}.jpg`,
+            `${__dirname}/../uploads/images/profile/${newStudent._id
+              .toString()
+              .replace(/\//g, "-")}.jpg`,
             req.body.image,
             "base64",
             (err) => {
@@ -1224,12 +1247,12 @@ var require_student = __commonJS({
       } catch (err) {
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
-    exports.activate = async function(req, res2) {
+    exports.activate = async function (req, res2) {
       const studentID2 = req.params.studentID.replace(/-/g, "/");
       try {
         const student = await Student.findById(studentID2);
@@ -1246,18 +1269,21 @@ var require_student = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.deactivate = async function(req, res2) {
+    exports.deactivate = async function (req, res2) {
       const studentID2 = req.params.studentID.replace(/-/g, "/");
       try {
         const student = await Student.findById(studentID2);
         if (student) {
           if (student.status === "active") {
-            await Student.updateOne({ _id: studentID2 }, { status: "inactive" });
+            await Student.updateOne(
+              { _id: studentID2 },
+              { status: "inactive" }
+            );
             res2.status(200).json({});
           } else {
             throw "Account already deactivated";
@@ -1268,12 +1294,12 @@ var require_student = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports._delete = async function(req, res2) {
+    exports._delete = async function (req, res2) {
       try {
         const studentID2 = req.params.studentID.replace(/-/g, "/");
         const student = await Student.findByIdAndDelete(studentID2);
@@ -1288,8 +1314,8 @@ var require_student = __commonJS({
       } catch (err) {
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
@@ -1301,20 +1327,22 @@ var require_student = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.getAllNotifications = async function(request, response) {
+    exports.getAllNotifications = async function (request, response) {
       const studentID2 = request.params.studentID.replace(/-/g, "/");
-      notificationModel().find({ recipient: studentID2 }, (error, documents) => {
-        response.status(200).json(documents);
-      });
+      notificationModel().find(
+        { recipient: studentID2 },
+        (error, documents) => {
+          response.status(200).json(documents);
+        }
+      );
     };
-    exports.deleteNotificationByID = async function(request, response) {
-    };
-    exports.countAllStudents = async function(callback2) {
+    exports.deleteNotificationByID = async function (request, response) {};
+    exports.countAllStudents = async function (callback2) {
       Student.countDocuments({}, (error, count) => {
         if (error) {
           callback2(error, null);
@@ -1323,13 +1351,17 @@ var require_student = __commonJS({
         }
       });
     };
-    exports.findAllStudents = async function(options, callback2) {
+    exports.findAllStudents = async function (options, callback2) {
       if (options.paginate) {
-        Student.find().sort({
-          firstName: "asc"
-        }).limit(options.count).skip(options.count * (options.page - 1)).exec(function(error, students) {
-          callback2(null, students);
-        });
+        Student.find()
+          .sort({
+            firstName: "asc",
+          })
+          .limit(options.count)
+          .skip(options.count * (options.page - 1))
+          .exec(function (error, students) {
+            callback2(null, students);
+          });
       } else {
         Student.findAll((error, document2) => {
           if (error) {
@@ -1340,7 +1372,7 @@ var require_student = __commonJS({
         });
       }
     };
-    exports.search = async function(search, callback2) {
+    exports.search = async function (search, callback2) {
       Student.findBySearch(search, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -1349,7 +1381,7 @@ var require_student = __commonJS({
         }
       });
     };
-    exports.findStudentByID = async function(studentID2, callback2) {
+    exports.findStudentByID = async function (studentID2, callback2) {
       Student.findByID(studentID2, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -1358,7 +1390,7 @@ var require_student = __commonJS({
         }
       });
     };
-    exports.findStudentByName = async function(name, callback2) {
+    exports.findStudentByName = async function (name, callback2) {
       Student.findByName(name, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -1367,37 +1399,41 @@ var require_student = __commonJS({
         }
       });
     };
-    exports.createStudent = async function(data2, callback2) {
+    exports.createStudent = async function (data2, callback2) {
       const salt = await bcrypt.genSalt(3);
       const hashedPassword = await bcrypt.hash(data2.password, salt);
-      Student.create({ ...data2, password: hashedPassword }).then((document2) => {
-        if (data2.class) {
-          Class.updateOne(
-            { _id: data2.class },
-            { $push: { students: document2._id } },
-            (error, documents) => {
-              console.log(error);
-            }
-          );
-        }
-        if (data2.image) {
-          fs.writeFile(
-            `${__dirname}/../uploads/images/profile/${document2._id.toString().replace(/\//g, "-")}.jpg`,
-            data2.image,
-            "base64",
-            (error) => {
-              if (error) {
+      Student.create({ ...data2, password: hashedPassword })
+        .then((document2) => {
+          if (data2.class) {
+            Class.updateOne(
+              { _id: data2.class },
+              { $push: { students: document2._id } },
+              (error, documents) => {
                 console.log(error);
               }
-            }
-          );
-        }
-        callback2(null, document2);
-      }).catch((error) => {
-        callback2(error.message, null);
-      });
+            );
+          }
+          if (data2.image) {
+            fs.writeFile(
+              `${__dirname}/../uploads/images/profile/${document2._id
+                .toString()
+                .replace(/\//g, "-")}.jpg`,
+              data2.image,
+              "base64",
+              (error) => {
+                if (error) {
+                  console.log(error);
+                }
+              }
+            );
+          }
+          callback2(null, document2);
+        })
+        .catch((error) => {
+          callback2(error.message, null);
+        });
     };
-    exports.updateStudentByID = async function(studentID2, data2, callback2) {
+    exports.updateStudentByID = async function (studentID2, data2, callback2) {
       Student.updateOne(
         { _id: studentID2 },
         { $set: { ...data2 } },
@@ -1410,36 +1446,42 @@ var require_student = __commonJS({
         }
       );
     };
-    exports.deleteStudentByID = async function(studentID2, callback2) {
+    exports.deleteStudentByID = async function (studentID2, callback2) {
       Student.deleteOne({ _id: studentID2 }, (error) => {
         if (error) {
           callback2(error);
         } else {
-          Result.find().where("student").equals(studentID2).exec((error2, results) => {
-            if (error2) {
-              callback2(error2);
-            } else {
-              results.forEach((result, index) => {
-                Result.deleteOne({ _id: result._id }, (error3) => {
-                  if (error3) {
-                    console.log(error3);
-                  }
+          Result.find()
+            .where("student")
+            .equals(studentID2)
+            .exec((error2, results) => {
+              if (error2) {
+                callback2(error2);
+              } else {
+                results.forEach((result, index) => {
+                  Result.deleteOne({ _id: result._id }, (error3) => {
+                    if (error3) {
+                      console.log(error3);
+                    }
+                  });
                 });
-              });
-            }
-          });
-          Class.find().where("students").in(studentID2).exec((error2, classes) => {
-            if (error2) {
-              console.log(error2);
-            } else {
-              classes.forEach((_class, index) => {
-                Class.updateOne(
-                  { _id: _class._id },
-                  { $pull: { students: studentID2 } }
-                );
-              });
-            }
-          });
+              }
+            });
+          Class.find()
+            .where("students")
+            .in(studentID2)
+            .exec((error2, classes) => {
+              if (error2) {
+                console.log(error2);
+              } else {
+                classes.forEach((_class, index) => {
+                  Class.updateOne(
+                    { _id: _class._id },
+                    { $pull: { students: studentID2 } }
+                  );
+                });
+              }
+            });
         }
       });
     };
@@ -1459,7 +1501,7 @@ var require_student = __commonJS({
             }
           }
         });
-      }
+      },
     };
     exports.invoices = {
       findAll() {
@@ -1474,9 +1516,9 @@ var require_student = __commonJS({
             }
           }
         });
-      }
+      },
     };
-  }
+  },
 });
 
 // controllers/invoice.js
@@ -1484,26 +1526,34 @@ var require_invoice = __commonJS({
   "controllers/invoice.js"(exports) {
     var models2 = require_models();
     var studentController = require_student();
-    var { invoiceModel: invoiceModel2, notificationModel, studentModel } = models2;
-    exports.findAllInvoices = async function(options, callback2) {
-      invoiceModel2.default.find({ type: "DEFAULT" }).exec((error, documents) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, documents);
-        }
-      });
+    var {
+      invoiceModel: invoiceModel2,
+      notificationModel,
+      studentModel,
+    } = models2;
+    exports.findAllInvoices = async function (options, callback2) {
+      invoiceModel2.default
+        .find({ type: "DEFAULT" })
+        .exec((error, documents) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, documents);
+          }
+        });
     };
-    exports.countAllInvoices = async function(callback2) {
-      invoiceModel2.default.countDocuments({ type: "DEFAULT" }).exec((error, count) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, count);
-        }
-      });
+    exports.countAllInvoices = async function (callback2) {
+      invoiceModel2.default
+        .countDocuments({ type: "DEFAULT" })
+        .exec((error, count) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, count);
+          }
+        });
     };
-    exports.findInvoiceByID = async function(invoiceID, callback2) {
+    exports.findInvoiceByID = async function (invoiceID, callback2) {
       invoiceModel2.default.findOne(
         { _id: invoiceID, type: "DEFAULT" },
         (error, document2) => {
@@ -1515,50 +1565,57 @@ var require_invoice = __commonJS({
         }
       );
     };
-    exports.createInvoice = async function(data2, callback2) {
-      invoiceModel2.default.create({ ...data2 }).then((document2) => {
-        studentModel.findOne({ _id: data2.issuedTo }, (error, student) => {
-          if (error) {
-            invoiceModel2.default.deleteOne({ _id: document2._id }).exec();
-            callback2(error.message);
-          } else {
-            if (student) {
-              studentModel.updateOne(
-                { _id: student._id },
-                { $push: { invoices: document2._id } },
-                (error2) => {
-                  if (error2) {
-                    invoiceModel2.default.deleteOne({ _id: document2._id }).exec();
-                    callback2(error2.message);
-                  }
-                }
-              );
-            } else {
+    exports.createInvoice = async function (data2, callback2) {
+      invoiceModel2.default
+        .create({ ...data2 })
+        .then((document2) => {
+          studentModel.findOne({ _id: data2.issuedTo }, (error, student) => {
+            if (error) {
               invoiceModel2.default.deleteOne({ _id: document2._id }).exec();
-              callback2("Student does not exist!");
+              callback2(error.message);
+            } else {
+              if (student) {
+                studentModel.updateOne(
+                  { _id: student._id },
+                  { $push: { invoices: document2._id } },
+                  (error2) => {
+                    if (error2) {
+                      invoiceModel2.default
+                        .deleteOne({ _id: document2._id })
+                        .exec();
+                      callback2(error2.message);
+                    }
+                  }
+                );
+              } else {
+                invoiceModel2.default.deleteOne({ _id: document2._id }).exec();
+                callback2("Student does not exist!");
+              }
             }
-          }
+          });
+        })
+        .catch((error) => {
+          console.log("ERROR: " + error);
+          callback2(error);
         });
-      }).catch((error) => {
-        console.log("ERROR: " + error);
-        callback2(error);
-      });
     };
-    exports.updateInvoiceByID = async function(request, response) {
+    exports.updateInvoiceByID = async function (request, response) {
       let invoice = request.payload.invoice;
-      invoiceModel2(request.body.invoice.type).findByIdAndUpdate(
-        invoice._id,
-        { $set: { ...request.body } },
-        { new: true },
-        (error, document2) => {
-          if (error) {
-            response.status(400).send(error.message);
+      invoiceModel2(request.body.invoice.type)
+        .findByIdAndUpdate(
+          invoice._id,
+          { $set: { ...request.body } },
+          { new: true },
+          (error, document2) => {
+            if (error) {
+              response.status(400).send(error.message);
+            }
+            response.status(200).json(document2);
           }
-          response.status(200).json(document2);
-        }
-      ).populate("issuedTo");
+        )
+        .populate("issuedTo");
     };
-    exports.deleteInvoiceByID = async function(invoiceID, callback2) {
+    exports.deleteInvoiceByID = async function (invoiceID, callback2) {
       invoiceModel2.default.deleteOne(
         { type: "DEFAULT", _id: invoiceID },
         (error) => {
@@ -1571,25 +1628,29 @@ var require_invoice = __commonJS({
       );
     };
     exports.templates = {
-      findAllInvoices: async function(options, callback2) {
-        invoiceModel2.template.find({ type: "TEMPLATE" }).exec((error, documents) => {
-          if (error) {
-            callback2(error, null);
-          } else {
-            callback2(null, documents);
-          }
-        });
+      findAllInvoices: async function (options, callback2) {
+        invoiceModel2.template
+          .find({ type: "TEMPLATE" })
+          .exec((error, documents) => {
+            if (error) {
+              callback2(error, null);
+            } else {
+              callback2(null, documents);
+            }
+          });
       },
-      countAllInvoices: async function(callback2) {
-        invoiceModel2.template.countDocuments({ type: "TEMPLATE" }).exec((error, count) => {
-          if (error) {
-            callback2(error, null);
-          } else {
-            callback2(null, count);
-          }
-        });
+      countAllInvoices: async function (callback2) {
+        invoiceModel2.template
+          .countDocuments({ type: "TEMPLATE" })
+          .exec((error, count) => {
+            if (error) {
+              callback2(error, null);
+            } else {
+              callback2(null, count);
+            }
+          });
       },
-      findInvoiceByID: async function(invoiceID, callback2) {
+      findInvoiceByID: async function (invoiceID, callback2) {
         invoiceModel2.template.findOne(
           { _id: invoiceID, type: "TEMPLATE" },
           (error, document2) => {
@@ -1601,30 +1662,35 @@ var require_invoice = __commonJS({
           }
         );
       },
-      createInvoice: async function(data2, callback2) {
-        invoiceModel2.template.create({ ...data2 }).then((document2) => {
-          console.log(document2);
-          callback2(null);
-        }).catch((error) => {
-          console.log("ERROR: " + error);
-          callback2(error);
-        });
+      createInvoice: async function (data2, callback2) {
+        invoiceModel2.template
+          .create({ ...data2 })
+          .then((document2) => {
+            console.log(document2);
+            callback2(null);
+          })
+          .catch((error) => {
+            console.log("ERROR: " + error);
+            callback2(error);
+          });
       },
-      updateInvoiceByID: async function(request, response) {
+      updateInvoiceByID: async function (request, response) {
         let invoice = request.payload.invoice;
-        invoiceModel2(request.body.invoice.type).findByIdAndUpdate(
-          invoice._id,
-          { $set: { ...request.body } },
-          { new: true },
-          (error, document2) => {
-            if (error) {
-              response.status(400).send(error.message);
+        invoiceModel2(request.body.invoice.type)
+          .findByIdAndUpdate(
+            invoice._id,
+            { $set: { ...request.body } },
+            { new: true },
+            (error, document2) => {
+              if (error) {
+                response.status(400).send(error.message);
+              }
+              response.status(200).json(document2);
             }
-            response.status(200).json(document2);
-          }
-        ).populate("issuedTo");
+          )
+          .populate("issuedTo");
       },
-      deleteInvoiceByID: async function(invoiceID, callback2) {
+      deleteInvoiceByID: async function (invoiceID, callback2) {
         invoiceModel2.template.deleteOne(
           { type: "TEMPLATE", _id: invoiceID },
           (error) => {
@@ -1635,9 +1701,9 @@ var require_invoice = __commonJS({
             }
           }
         );
-      }
+      },
     };
-  }
+  },
 });
 
 // controllers/notification.js
@@ -1658,8 +1724,7 @@ var require_notification2 = __commonJS({
         }
       );
     }
-    async function getByID(request, response) {
-    }
+    async function getByID(request, response) {}
     async function deleteByID(request, response) {
       let notificationID = request.params.notificationID;
       console.log(request.query.type);
@@ -1681,17 +1746,16 @@ var require_notification2 = __commonJS({
         }
       );
     }
-    async function deleteManyByID(request, response) {
-    }
+    async function deleteManyByID(request, response) {}
     module2.exports = {
       getAll,
       create,
       getByID,
       deleteByID,
       updateByID,
-      deleteManyByID
+      deleteManyByID,
     };
-  }
+  },
 });
 
 // controllers/admin.js
@@ -1701,30 +1765,36 @@ var require_admin = __commonJS({
     var mongoose2 = require("mongoose");
     var jsonwebtoken2 = require("jsonwebtoken");
     var Admin = require_adminModel();
-    exports.getAdmin = async function(req, res2) {
+    exports.getAdmin = async function (req, res2) {
       const admin = await Admin.findOne({ _id: req.params.id });
       res2.status(200).json(admin);
     };
-    exports.createAdmin = async function(data2, callback2) {
+    exports.createAdmin = async function (data2, callback2) {
       const salt = await bcrypt.genSalt(3);
       const hashedPassword = await bcrypt.hash(data2.password, salt);
-      Admin.create({ ...data2, password: hashedPassword }).then((document2) => {
-        callback2(null, document2);
-      }).catch((error) => {
-        callback2(error, null);
-      });
-    };
-    exports.findAllAdmins = async function(options, callback2) {
-      if (options.paginate) {
-        Admin.find().sort({
-          firstName: "asc"
-        }).limit(options.count).skip(options.count * (options.page - 1)).exec(function(error, admins) {
-          if (error) {
-            callback2(error, null);
-          } else {
-            callback2(null, admins);
-          }
+      Admin.create({ ...data2, password: hashedPassword })
+        .then((document2) => {
+          callback2(null, document2);
+        })
+        .catch((error) => {
+          callback2(error, null);
         });
+    };
+    exports.findAllAdmins = async function (options, callback2) {
+      if (options.paginate) {
+        Admin.find()
+          .sort({
+            firstName: "asc",
+          })
+          .limit(options.count)
+          .skip(options.count * (options.page - 1))
+          .exec(function (error, admins) {
+            if (error) {
+              callback2(error, null);
+            } else {
+              callback2(null, admins);
+            }
+          });
       } else {
         Admin.findAll((error, documents) => {
           if (error) {
@@ -1735,7 +1805,7 @@ var require_admin = __commonJS({
         });
       }
     };
-    exports.findAdminByEmailAddress = async function(emailAddress, callback2) {
+    exports.findAdminByEmailAddress = async function (emailAddress, callback2) {
       Admin.findByEmailAddress(emailAddress, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -1744,7 +1814,7 @@ var require_admin = __commonJS({
         }
       });
     };
-  }
+  },
 });
 
 // controllers/result.js
@@ -1752,38 +1822,44 @@ var require_result = __commonJS({
   "controllers/result.js"(exports) {
     var Result = require_resultModel();
     var Student = require_studentModel();
-    exports.getAllResults = async function(req, res2) {
-      const results = await Result.find({}).populate([
-        { path: "class", select: "-image -password" },
-        { path: "student", select: "-image -password" },
-        { path: "uploadedBy", select: "-image -password" }
-      ]).exec();
+    exports.getAllResults = async function (req, res2) {
+      const results = await Result.find({})
+        .populate([
+          { path: "class", select: "-image -password" },
+          { path: "student", select: "-image -password" },
+          { path: "uploadedBy", select: "-image -password" },
+        ])
+        .exec();
       res2.status(200).json(results);
     };
-    exports.getResultsByClass = async function(req, res2) {
+    exports.getResultsByClass = async function (req, res2) {
       const classID = req.params.classID;
-      const results = await Result.find({}).where("class").equals(classID).populate([
-        { path: "class", select: "-password" },
-        { path: "student", select: "-password" },
-        { path: "uploadedBy", select: "-password" }
-      ]).exec();
+      const results = await Result.find({})
+        .where("class")
+        .equals(classID)
+        .populate([
+          { path: "class", select: "-password" },
+          { path: "student", select: "-password" },
+          { path: "uploadedBy", select: "-password" },
+        ])
+        .exec();
       res2.status(200).json(results);
     };
-    exports.getResult = async function(req, res2) {
+    exports.getResult = async function (req, res2) {
       const result = await Result.findById(req.params.id).populate([
         "class",
         "student",
-        "uploadedBy"
+        "uploadedBy",
       ]);
       res2.status(200).json(result);
     };
-    exports.addResult = async function(req, res2) {
+    exports.addResult = async function (req, res2) {
       const studentID2 = req.body.student;
       try {
         const student = Student.findById(studentID2);
         if (student) {
           const newResult = await new Result({
-            ...req.body
+            ...req.body,
           }).save();
           await Student.updateOne(
             { _id: req.body.student },
@@ -1797,12 +1873,12 @@ var require_result = __commonJS({
         console.log(err);
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
-    exports.editResult = async function(req, res2) {
+    exports.editResult = async function (req, res2) {
       try {
         const resultID = req.params.resultID;
         await Result.updateOne(
@@ -1814,18 +1890,18 @@ var require_result = __commonJS({
         console.log(err);
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
-    exports.downloadResult = async function(req, res2, next) {
+    exports.downloadResult = async function (req, res2, next) {
       try {
         const resultID = req.params.resultID;
         const result = await Result.findById(resultID).populate([
           "class",
           "student",
-          "uploadedBy"
+          "uploadedBy",
         ]);
         if (!result) {
           throw "Result not found";
@@ -1836,12 +1912,12 @@ var require_result = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.countAllResults = function(callback2) {
+    exports.countAllResults = function (callback2) {
       Result.countDocuments({}, (error, count) => {
         if (error) {
           callback2(error, null);
@@ -1850,15 +1926,19 @@ var require_result = __commonJS({
         }
       });
     };
-    exports.findAllResults = async function(options, callback2) {
+    exports.findAllResults = async function (options, callback2) {
       if (options.paginate) {
-        Result.find({}).populate([
-          { path: "class", select: "-image -password" },
-          { path: "student", select: "-image -password" },
-          { path: "uploadedBy", select: "-image -password" }
-        ]).limit(options.count).skip(options.count * (options.page - 1)).exec(function(error, results) {
-          callback2(null, results);
-        });
+        Result.find({})
+          .populate([
+            { path: "class", select: "-image -password" },
+            { path: "student", select: "-image -password" },
+            { path: "uploadedBy", select: "-image -password" },
+          ])
+          .limit(options.count)
+          .skip(options.count * (options.page - 1))
+          .exec(function (error, results) {
+            callback2(null, results);
+          });
       } else {
         Result.findAll((error, documents) => {
           if (error) {
@@ -1869,7 +1949,7 @@ var require_result = __commonJS({
         });
       }
     };
-    exports.findResultbyID = async function(ID2, callback2) {
+    exports.findResultbyID = async function (ID2, callback2) {
       Result.findByID(ID2, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -1878,7 +1958,7 @@ var require_result = __commonJS({
         }
       });
     };
-    exports.findResultsByStudentID = async function(studentID2, callback2) {
+    exports.findResultsByStudentID = async function (studentID2, callback2) {
       Result.findResultByStudentID(studentID2, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -1887,24 +1967,26 @@ var require_result = __commonJS({
         }
       });
     };
-    exports.uploadResult = async function(data2, callback2) {
+    exports.uploadResult = async function (data2, callback2) {
       Student.findById(data2.student, (error, student) => {
         if (student) {
-          Result.create({ ...data2 }).then((result) => {
-            Student.updateOne(
-              { _id: data2.student },
-              { $push: { results: result._id } },
-              (error2) => {
-                if (error2) {
-                  callback2(error2);
-                } else {
-                  callback2(null);
+          Result.create({ ...data2 })
+            .then((result) => {
+              Student.updateOne(
+                { _id: data2.student },
+                { $push: { results: result._id } },
+                (error2) => {
+                  if (error2) {
+                    callback2(error2);
+                  } else {
+                    callback2(null);
+                  }
                 }
-              }
-            );
-          }).catch((error2) => {
-            callback2(error2);
-          });
+              );
+            })
+            .catch((error2) => {
+              callback2(error2);
+            });
         } else {
           callback2(
             "This student does not exist!, Please check the ID and try again"
@@ -1912,7 +1994,7 @@ var require_result = __commonJS({
         }
       });
     };
-    exports.approveResult = async function(resultID, callback2) {
+    exports.approveResult = async function (resultID, callback2) {
       Result.updateOne(
         { _id: resultID },
         { $set: { isApproved: true } },
@@ -1925,34 +2007,37 @@ var require_result = __commonJS({
         }
       );
     };
-    exports.deleteResult = async function(resultID, callback2) {
+    exports.deleteResult = async function (resultID, callback2) {
       Result.deleteOne({ _id: resultID }, (error) => {
         if (error) {
           callback2(error);
         } else {
-          Student.find().where("results").in(resultID).exec((error2, students) => {
-            console.log(students);
-            if (error2) {
-              console.log(error2);
-            } else {
-              students.forEach((student, index) => {
-                Student.updateOne(
-                  { _id: student._id },
-                  { $pull: { results: resultID } },
-                  (error3) => {
-                    if (error3) {
-                      console.log(error3);
+          Student.find()
+            .where("results")
+            .in(resultID)
+            .exec((error2, students) => {
+              console.log(students);
+              if (error2) {
+                console.log(error2);
+              } else {
+                students.forEach((student, index) => {
+                  Student.updateOne(
+                    { _id: student._id },
+                    { $pull: { results: resultID } },
+                    (error3) => {
+                      if (error3) {
+                        console.log(error3);
+                      }
                     }
-                  }
-                );
-              });
-              callback2(null);
-            }
-          });
+                  );
+                });
+                callback2(null);
+              }
+            });
         }
       });
     };
-  }
+  },
 });
 
 // models/feeModel.js
@@ -1967,24 +2052,20 @@ var require_feeModel = __commonJS({
       prices: [
         {
           variant: { type: String, default: "N/A" },
-          price: { type: Number, default: 0 }
-        }
+          price: { type: Number, default: 0 },
+        },
       ],
       isGrouped: { type: Boolean, default: false },
-      groupName: { type: String, default: "" }
+      groupName: { type: String, default: "" },
     });
     var feeSchema__withoutPriceVariations = new Schema({
       title: { type: String },
       hasPriceVariety: { type: Boolean, default: false },
       price: { type: Number, default: 0 },
       isGrouped: { type: Boolean, default: false },
-      groupName: { type: String, default: "" }
+      groupName: { type: String, default: "" },
     });
-    var FeeModel = model(
-      "Fee",
-      feeSchema,
-      "fees"
-    );
+    var FeeModel = model("Fee", feeSchema, "fees");
     var feeModel__withPriceVariations = model(
       "Fee__withPriceVariations",
       feeSchema__withPriceVariations,
@@ -1998,66 +2079,72 @@ var require_feeModel = __commonJS({
     module2.exports = {
       feeModel__withoutPriceVariations,
       feeModel__withPriceVariations,
-      FeeModel
+      FeeModel,
     };
-  }
+  },
 });
 
 // controllers/fee.js
 var require_fee = __commonJS({
   "controllers/fee.js"(exports) {
     var feeModel = require_feeModel();
-    var { feeModel__withPriceVariations, feeModel__withoutPriceVariations, FeeModel } = feeModel;
-    exports.getAllFees = async function(req, res2) {
+    var {
+      feeModel__withPriceVariations,
+      feeModel__withoutPriceVariations,
+      FeeModel,
+    } = feeModel;
+    exports.getAllFees = async function (req, res2) {
       const fees = await FeeModel.find({});
       res2.status(200).json(fees);
     };
-    exports.createFee = async function(req, res2) {
+    exports.createFee = async function (req, res2) {
       const fee = req.body;
       try {
         if (fee.hasPriceVariety === true) {
           const newFee = await new feeModel__withPriceVariations({
-            ...fee
+            ...fee,
           }).save();
           res2.status(200).json(newFee);
         }
         if (fee.hasPriceVariety === false) {
           const newFee = await new feeModel__withoutPriceVariations({
-            ...fee
+            ...fee,
           }).save();
           res2.status(200).json(newFee);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
-    exports.deleteFee = async function(req, res2) {
+    exports.deleteFee = async function (req, res2) {
       const feeID = req.params.feeID;
       await FeeModel.deleteOne({ _id: feeID });
       res2.status(200).json({});
     };
-  }
+  },
 });
 
 // models/termModel.js
 var require_termModel = __commonJS({
   "models/termModel.js"(exports, module2) {
     var { Schema, model } = require("mongoose");
-    var termSchema = new Schema({
-      name: {
-        type: String,
-        required: true
-      }
-    }, { collection: "term" });
+    var termSchema = new Schema(
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+      },
+      { collection: "term" }
+    );
     var Term = model("Term", termSchema);
     module2.exports = Term;
-  }
+  },
 });
 
 // controllers/term.js
 var require_term = __commonJS({
   "controllers/term.js"(exports) {
     var Term = require_termModel();
-    exports.getTerm = async function(req, res2) {
+    exports.getTerm = async function (req, res2) {
       const data2 = await Term.findOne({});
       if (!data2) {
         await new Term({ name: "Not Set" }).save();
@@ -2066,26 +2153,29 @@ var require_term = __commonJS({
         res2.status(200).json({ term: data2.name });
       }
     };
-    exports.setTerm = async function(req, res2) {
+    exports.setTerm = async function (req, res2) {
       await Term.updateOne({}, { name: req.body.term });
       res2.status(200).send({});
     };
-  }
+  },
 });
 
 // models/sessionModel.js
 var require_sessionModel = __commonJS({
   "models/sessionModel.js"(exports, module2) {
     var { Schema, model } = require("mongoose");
-    var sessionSchema = new Schema({
-      name: {
-        type: String,
-        required: true
-      }
-    }, { collection: "session" });
+    var sessionSchema = new Schema(
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+      },
+      { collection: "session" }
+    );
     var Session = model("Sesssion", sessionSchema);
     module2.exports = Session;
-  }
+  },
 });
 
 // controllers/session.js
@@ -2093,7 +2183,7 @@ var require_session = __commonJS({
   "controllers/session.js"(exports) {
     var Class = require_classModel();
     var Session = require_sessionModel();
-    exports.getSession = async function(req, res2) {
+    exports.getSession = async function (req, res2) {
       const data2 = await Session.findOne({});
       if (!data2) {
         await new Session({ name: "Not Set" }).save();
@@ -2102,11 +2192,11 @@ var require_session = __commonJS({
         res2.status(200).send({ session: data2.name });
       }
     };
-    exports.setSession = async function(req, res2) {
+    exports.setSession = async function (req, res2) {
       await Session.updateOne({}, { name: req.body.session });
       res2.status(200).send({});
     };
-  }
+  },
 });
 
 // controllers/teacher.js
@@ -2118,20 +2208,20 @@ var require_teacher = __commonJS({
     var Teacher = require_teacherModel();
     var Class = require_classModel();
     var fs = require("fs");
-    exports.getAllTeachers = async function(req, res2) {
+    exports.getAllTeachers = async function (req, res2) {
       const teachers = await Teacher.find({}, "-image");
       res2.status(200).json(teachers);
     };
-    exports.getTeacher = async function(req, res2) {
+    exports.getTeacher = async function (req, res2) {
       const teacher = await Teacher.findOne({ _id: req.params.id });
       res2.status(200).json(teacher);
     };
-    exports.addTeacher = async function(req, res2) {
+    exports.addTeacher = async function (req, res2) {
       const salt = await bcrypt.genSalt(3);
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
       const newTeacher = await new Teacher({
         ...req.body,
-        password: hashedPassword
+        password: hashedPassword,
       }).save();
       if (req.body.class) {
         const isValidClass = mongoose2.Types.ObjectId.isValid(req.body.class);
@@ -2144,7 +2234,9 @@ var require_teacher = __commonJS({
       }
       if (req.body.image) {
         fs.writeFile(
-          `${__dirname}/../uploads/images/profile/${newTeacher._id.toString().replace(/\//g, "-")}.jpg`,
+          `${__dirname}/../uploads/images/profile/${newTeacher._id
+            .toString()
+            .replace(/\//g, "-")}.jpg`,
           req.body.image,
           "base64",
           (err) => {
@@ -2156,11 +2248,11 @@ var require_teacher = __commonJS({
       }
       res2.status(200).json(newTeacher);
     };
-    exports.login = async function(req, res2) {
+    exports.login = async function (req, res2) {
       try {
-        const teacher = await Teacher.findOne({ email: req.body.email }).populate(
-          "class"
-        );
+        const teacher = await Teacher.findOne({
+          email: req.body.email,
+        }).populate("class");
         if (teacher) {
           const isPasswordMatched = await bcrypt.compare(
             req.body.password,
@@ -2187,12 +2279,12 @@ var require_teacher = __commonJS({
         console.log(err);
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
-    exports.activate = async function(req, res2) {
+    exports.activate = async function (req, res2) {
       const teacherID = req.params.teacherID.replace(/-/g, "/");
       try {
         const teacher = await Teacher.findById(teacherID);
@@ -2209,12 +2301,12 @@ var require_teacher = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.deactivate = async function(req, res2) {
+    exports.deactivate = async function (req, res2) {
       const teacherID = req.params.teacherID.replace(/-/g, "/");
       try {
         const teacher = await Teacher.findById(teacherID);
@@ -2231,12 +2323,12 @@ var require_teacher = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports._delete = async function(req, res2) {
+    exports._delete = async function (req, res2) {
       try {
         const teacherID = req.params.teacherID.replace(/-/g, "/");
         await Teacher.findByIdAndDelete(teacherID);
@@ -2244,8 +2336,8 @@ var require_teacher = __commonJS({
       } catch (err) {
         res2.status(400).json({
           error: {
-            message: err
-          }
+            message: err,
+          },
         });
       }
     };
@@ -2265,12 +2357,12 @@ var require_teacher = __commonJS({
       } catch (error) {
         res2.status(400).json({
           error: {
-            message: error
-          }
+            message: error,
+          },
         });
       }
     };
-    exports.countAllTeachers = async function(callback2) {
+    exports.countAllTeachers = async function (callback2) {
       Teacher.countDocuments({}, (error, count) => {
         if (error) {
           callback2(error, null);
@@ -2279,7 +2371,7 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.findAllTeachers = async function(options, callback2) {
+    exports.findAllTeachers = async function (options, callback2) {
       Teacher.findAll((error, document2) => {
         if (error) {
           callback2(error, null);
@@ -2288,7 +2380,7 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.findTeacherByID = async function(ID2, callback2) {
+    exports.findTeacherByID = async function (ID2, callback2) {
       Teacher.findByID(ID2, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -2297,7 +2389,7 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.findTeacherByName = async function(name, callback2) {
+    exports.findTeacherByName = async function (name, callback2) {
       Teacher.findByName(name, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -2306,7 +2398,7 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.findTeacherByEmailAddress = async function(email, callback2) {
+    exports.findTeacherByEmailAddress = async function (email, callback2) {
       Teacher.findByEmailAddress(email, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -2315,41 +2407,45 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.createTeacher = async function(data2, callback2) {
+    exports.createTeacher = async function (data2, callback2) {
       const salt = await bcrypt.genSalt(3);
       const hashedPassword = await bcrypt.hash(data2.password, salt);
-      Teacher.create({ ...data2, password: hashedPassword }).then((document2) => {
-        if (data2.class && data2.class.length > 0) {
-          Class.updateOne(
-            { _id: data2.class },
-            { $push: { teachers: document2._id } },
-            (error, documents) => {
-              if (error) {
-                console.log(error);
+      Teacher.create({ ...data2, password: hashedPassword })
+        .then((document2) => {
+          if (data2.class && data2.class.length > 0) {
+            Class.updateOne(
+              { _id: data2.class },
+              { $push: { teachers: document2._id } },
+              (error, documents) => {
+                if (error) {
+                  console.log(error);
+                }
               }
-            }
-          );
-        }
-        if (data2.image) {
-          fs.writeFile(
-            `${__dirname}/../uploads/images/profile/${document2._id.toString().replace(/\//g, "-")}.jpg`,
-            data2.image,
-            "base64",
-            (error) => {
-              if (error) {
-                console.log(error);
+            );
+          }
+          if (data2.image) {
+            fs.writeFile(
+              `${__dirname}/../uploads/images/profile/${document2._id
+                .toString()
+                .replace(/\//g, "-")}.jpg`,
+              data2.image,
+              "base64",
+              (error) => {
+                if (error) {
+                  console.log(error);
+                }
               }
-            }
-          );
-        }
-        callback2(null, document2);
-      }).catch((error) => {
-        if (error) {
-          callback2(error, null);
-        }
-      });
+            );
+          }
+          callback2(null, document2);
+        })
+        .catch((error) => {
+          if (error) {
+            callback2(error, null);
+          }
+        });
     };
-    exports.updateTeacherByID = async function(ID2, update, callback2) {
+    exports.updateTeacherByID = async function (ID2, update, callback2) {
       Teacher.updateOne({ _id: ID2 }, { ...update }, (error) => {
         if (error) {
           callback2(error);
@@ -2358,33 +2454,36 @@ var require_teacher = __commonJS({
         }
       });
     };
-    exports.deleteTeacherByID = async function(ID2, callback2) {
+    exports.deleteTeacherByID = async function (ID2, callback2) {
       Teacher.deleteOne({ _id: ID2 }, (error) => {
         if (error) {
           callback2(error);
         } else {
-          Class.find().where("teachers").in(ID2).exec((error2, classes) => {
-            if (error2) {
-              console.log(error2);
-            } else {
-              classes.forEach((_class, index) => {
-                Class.updateOne(
-                  { _id: _class._id },
-                  { $pull: { teachers: ID2 } },
-                  (error3) => {
-                    if (error3) {
-                      console.log(error3);
+          Class.find()
+            .where("teachers")
+            .in(ID2)
+            .exec((error2, classes) => {
+              if (error2) {
+                console.log(error2);
+              } else {
+                classes.forEach((_class, index) => {
+                  Class.updateOne(
+                    { _id: _class._id },
+                    { $pull: { teachers: ID2 } },
+                    (error3) => {
+                      if (error3) {
+                        console.log(error3);
+                      }
                     }
-                  }
-                );
-              });
-              callback2(null);
-            }
-          });
+                  );
+                });
+                callback2(null);
+              }
+            });
         }
       });
     };
-  }
+  },
 });
 
 // controllers/auth.js
@@ -2398,95 +2497,113 @@ var require_auth = __commonJS({
     var adminController = require_admin();
     var { administratorModel } = models2;
     exports.signin = {
-      student: async function(studentID2, password, callback2) {
+      student: async function (studentID2, password, callback2) {
         studentController.findStudentByID(studentID2, (error, student) => {
           if (error) {
             callback2(error, null);
           } else {
             if (student) {
-              bcrypt.compare(password, student.password).then((match) => {
-                if (match) {
-                  if (student.status === "banned" || student.status === "disabled") {
-                    callback2(
-                      "This account has been banned, Please contact the administrator.",
-                      null
-                    );
+              bcrypt
+                .compare(password, student.password)
+                .then((match) => {
+                  if (match) {
+                    if (
+                      student.status === "banned" ||
+                      student.status === "disabled"
+                    ) {
+                      callback2(
+                        "This account has been banned, Please contact the administrator.",
+                        null
+                      );
+                    } else {
+                      const accessToken2 = jsonwebtoken2.sign(
+                        { id: student.id, role: "student" },
+                        process.env.TOKEN_SECRET
+                      );
+                      callback2(null, {
+                        accessToken: accessToken2,
+                        ...student._doc,
+                      });
+                    }
                   } else {
-                    const accessToken2 = jsonwebtoken2.sign(
-                      { id: student.id, role: "student" },
-                      process.env.TOKEN_SECRET
-                    );
-                    callback2(null, {
-                      accessToken: accessToken2,
-                      ...student._doc
-                    });
+                    callback2("Password and StudentID do not match", null);
                   }
-                } else {
-                  callback2("Password and StudentID do not match", null);
-                }
-              }).catch((error2) => {
-                callback2(error2, null);
-              });
+                })
+                .catch((error2) => {
+                  callback2(error2, null);
+                });
             } else {
               callback2("Invalid student ID", null);
             }
           }
         });
       },
-      teacher: async function(email, password, callback2) {
+      teacher: async function (email, password, callback2) {
         teacherController.findTeacherByEmailAddress(email, (error, teacher) => {
           if (error) {
             callback2(error, null);
           } else {
-            bcrypt.compare(password, teacher.password).then((match) => {
-              if (match) {
-                if (teacher.status === "banned" || teacher.status === "disabled") {
-                  callback2(
-                    "This account has been banned, Please contact the administrator.",
-                    null
-                  );
-                } else {
-                  const accessToken2 = jsonwebtoken2.sign(
-                    {
-                      id: teacher._id,
-                      role: teacher.role
-                    },
-                    process.env.TOKEN_SECRET
-                  );
-                  teacherController.updateTeacherByID(
-                    teacher._id,
-                    {
-                      $set: { lastSeen: (/* @__PURE__ */ new Date()).getTime() }
-                    },
-                    (error2) => {
-                      if (error2) {
-                        callback2(error2, null);
-                      } else {
-                        callback2(null, {
-                          accessToken: accessToken2,
-                          ...teacher._doc
-                        });
+            bcrypt
+              .compare(password, teacher.password)
+              .then((match) => {
+                if (match) {
+                  if (
+                    teacher.status === "banned" ||
+                    teacher.status === "disabled"
+                  ) {
+                    callback2(
+                      "This account has been banned, Please contact the administrator.",
+                      null
+                    );
+                  } else {
+                    const accessToken2 = jsonwebtoken2.sign(
+                      {
+                        id: teacher._id,
+                        role: teacher.role,
+                      },
+                      process.env.TOKEN_SECRET
+                    );
+                    teacherController.updateTeacherByID(
+                      teacher._id,
+                      {
+                        $set: {
+                          lastSeen: /* @__PURE__ */ new Date().getTime(),
+                        },
+                      },
+                      (error2) => {
+                        if (error2) {
+                          callback2(error2, null);
+                        } else {
+                          callback2(null, {
+                            accessToken: accessToken2,
+                            ...teacher._doc,
+                          });
+                        }
                       }
-                    }
-                  );
+                    );
+                  }
+                } else {
+                  callback2("Invalid email address or password", null);
                 }
-              } else {
-                callback2("Invalid email address or password", null);
-              }
-            }).catch((error2) => {
-              callback2(error2, null);
-            });
+              })
+              .catch((error2) => {
+                callback2(error2, null);
+              });
           }
         });
       },
-      admin: async function(request, response) {
+      admin: async function (request, response) {
         let emailAddress = request.body.emailAddress;
         let password = request.body.password;
         let administrator;
         try {
-          administrator = await administratorModel.findOne({ email: emailAddress });
+          administrator = await administratorModel.findOne({
+            email: emailAddress,
+          });
           if (!administrator) {
-            return response.status(400).send("Invalid email address or password");
+            return response
+              .status(400)
+              .send("Invalid email address or password");
           }
           let passwordMatch = await bcrypt.compare(
             request.body.password,
@@ -2495,15 +2612,20 @@ var require_auth = __commonJS({
           if (!passwordMatch) {
             return response.status(400).send("Incorrect password!");
           }
-          if (administrator.status === "banned" || administrator.status === "suspended") {
-            return response.status(400).send(
-              `This account has been ${administrator.status}, Please contact the administrator.`
-            );
+          if (
+            administrator.status === "banned" ||
+            administrator.status === "suspended"
+          ) {
+            return response
+              .status(400)
+              .send(
+                `This account has been ${administrator.status}, Please contact the administrator.`
+              );
           }
           await administratorModel.updateOne(
             { _id: administrator._id },
             {
-              $set: { lastSeen: (/* @__PURE__ */ new Date()).getTime() }
+              $set: { lastSeen: /* @__PURE__ */ new Date().getTime() },
             }
           );
           const accessToken2 = jsonwebtoken2.sign(
@@ -2512,24 +2634,28 @@ var require_auth = __commonJS({
           );
           response.status(200).json({
             ...administrator.toJSON(),
-            accessToken: accessToken2
+            accessToken: accessToken2,
           });
         } catch (error) {
           console.log(error.message);
           response.status(400).send("unable to process this request");
         }
-      }
+      },
     };
-    exports.verifyAccessToken = async function(accessToken2, callback2) {
-      jsonwebtoken2.verify(accessToken2, process.env.TOKEN_SECRET, (error, data2) => {
-        if (error) {
-          callback2(error, null);
-        } else {
-          callback2(null, data2);
+    exports.verifyAccessToken = async function (accessToken2, callback2) {
+      jsonwebtoken2.verify(
+        accessToken2,
+        process.env.TOKEN_SECRET,
+        (error, data2) => {
+          if (error) {
+            callback2(error, null);
+          } else {
+            callback2(null, data2);
+          }
         }
-      });
+      );
     };
-  }
+  },
 });
 
 // controllers/announcement.js
@@ -2538,7 +2664,7 @@ var require_announcement2 = __commonJS({
     var models2 = require_models();
     var classController = require_class();
     var { announcementModel } = models2;
-    exports.findAllAnnouncements = async function(callback2) {
+    exports.findAllAnnouncements = async function (callback2) {
       announcementModel().findAll({}, (error, documents) => {
         if (error) {
           callback2(error, null);
@@ -2547,7 +2673,7 @@ var require_announcement2 = __commonJS({
         }
       });
     };
-    exports.findAnnouncements = async function(options, callback2) {
+    exports.findAnnouncements = async function (options, callback2) {
       switch (options.by) {
         case "visibility":
           announcementModel().find(
@@ -2566,14 +2692,17 @@ var require_announcement2 = __commonJS({
           break;
       }
     };
-    exports.createAnnouncement = async function(data2, options, callback2) {
-      announcementModel({ ...options }).create({ ...data2 }).then((document2) => {
-        callback2(null, document2);
-      }).catch((error) => {
-        callback2(error, null);
-      });
+    exports.createAnnouncement = async function (data2, options, callback2) {
+      announcementModel({ ...options })
+        .create({ ...data2 })
+        .then((document2) => {
+          callback2(null, document2);
+        })
+        .catch((error) => {
+          callback2(error, null);
+        });
     };
-    exports.findAnnouncementByID = async function(announcementID, callback2) {
+    exports.findAnnouncementByID = async function (announcementID, callback2) {
       announcementModel().findByID(announcementID, (error, document2) => {
         if (error) {
           callback2(error, null);
@@ -2582,7 +2711,10 @@ var require_announcement2 = __commonJS({
         }
       });
     };
-    exports.deleteAnnouncementByID = async function(announcementID, callback2) {
+    exports.deleteAnnouncementByID = async function (
+      announcementID,
+      callback2
+    ) {
       announcementModel().deleteOne({ _id: announcementID }, (error) => {
         if (error) {
           callback2(error.message);
@@ -2591,7 +2723,11 @@ var require_announcement2 = __commonJS({
         }
       });
     };
-    exports.updateAnnouncementByID = async function(announcementID, options, callback2) {
+    exports.updateAnnouncementByID = async function (
+      announcementID,
+      options,
+      callback2
+    ) {
       switch (options.action) {
         case "hide":
           announcementModel().updateOne(
@@ -2623,7 +2759,7 @@ var require_announcement2 = __commonJS({
           callback2("Invalid action!");
       }
     };
-  }
+  },
 });
 
 // controllers/index.js
@@ -2653,9 +2789,9 @@ var require_controllers = __commonJS({
       sessionController,
       teacherController,
       authController,
-      announcementController
+      announcementController,
     };
-  }
+  },
 });
 
 // middlewares/verifyAccessToken.js
@@ -2666,8 +2802,7 @@ var require_verifyAccessToken = __commonJS({
     var { authController } = controllers;
     var verify = (request, response, next) => {
       const token = request.header("access-token");
-      if (!token)
-        return res.status(401).json({ msg: "Access Denied" });
+      if (!token) return res.status(401).json({ msg: "Access Denied" });
       try {
         jsonwebtoken.verify(
           accessToken,
@@ -2679,7 +2814,7 @@ var require_verifyAccessToken = __commonJS({
               request.payload = {
                 ...request.payload,
                 role: data2.role,
-                id: data2.id
+                id: data2.id,
               };
               next();
             }
@@ -2691,7 +2826,7 @@ var require_verifyAccessToken = __commonJS({
       }
     };
     module2.exports = verify;
-  }
+  },
 });
 
 // middlewares/generateStudentID.js
@@ -2699,12 +2834,14 @@ var require_generateStudentID = __commonJS({
   "middlewares/generateStudentID.js"(exports, module2) {
     var uuid = require("uuid");
     function generateStudentID(req, res2, next) {
-      const studentID2 = `pbs/${(/* @__PURE__ */ new Date()).getFullYear()}/${uuid.v4().split("-")[0]}`;
+      const studentID2 = `pbs/${/* @__PURE__ */ new Date().getFullYear()}/${
+        uuid.v4().split("-")[0]
+      }`;
       req.body._id = studentID2;
       next();
     }
     module2.exports = generateStudentID;
-  }
+  },
 });
 
 // middlewares/aggregateScores.js
@@ -2720,22 +2857,80 @@ var require_aggregateScores = __commonJS({
       let grade = "";
       switch (gradingScale) {
         case "foundation":
-          grade = rangeCompare(90, 100, score) && "A+" || rangeCompare(80, 89, score) && "A" || rangeCompare(75, 79, score) && "B+" || rangeCompare(65, 74, score) && "B" || rangeCompare(60, 64, score) && "C+" || rangeCompare(50, 59, score) && "C" || rangeCompare(40, 49, score) && "D" || rangeCompare(0, 39, score) && "F";
+          grade =
+            (rangeCompare(90, 100, score) && "A+") ||
+            (rangeCompare(80, 89, score) && "A") ||
+            (rangeCompare(75, 79, score) && "B+") ||
+            (rangeCompare(65, 74, score) && "B") ||
+            (rangeCompare(60, 64, score) && "C+") ||
+            (rangeCompare(50, 59, score) && "C") ||
+            (rangeCompare(40, 49, score) && "D") ||
+            (rangeCompare(0, 39, score) && "F");
           break;
         case "pbs":
-          grade = rangeCompare(95, 100, score) && "A+" || rangeCompare(90, 94, score) && "A" || rangeCompare(85, 89, score) && "A-" || rangeCompare(80, 84, score) && "B+" || rangeCompare(75, 79, score) && "B" || rangeCompare(70, 74, score) && "B-" || rangeCompare(65, 69, score) && "C+" || rangeCompare(60, 64, score) && "C" || rangeCompare(56, 59, score) && "C-" || rangeCompare(50, 55, score) && "D" || rangeCompare(40, 49, score) && "E" || rangeCompare(30, 39, score) && "F" || rangeCompare(0, 29, score) && "U";
+          grade =
+            (rangeCompare(95, 100, score) && "A+") ||
+            (rangeCompare(90, 94, score) && "A") ||
+            (rangeCompare(85, 89, score) && "A-") ||
+            (rangeCompare(80, 84, score) && "B+") ||
+            (rangeCompare(75, 79, score) && "B") ||
+            (rangeCompare(70, 74, score) && "B-") ||
+            (rangeCompare(65, 69, score) && "C+") ||
+            (rangeCompare(60, 64, score) && "C") ||
+            (rangeCompare(56, 59, score) && "C-") ||
+            (rangeCompare(50, 55, score) && "D") ||
+            (rangeCompare(40, 49, score) && "E") ||
+            (rangeCompare(30, 39, score) && "F") ||
+            (rangeCompare(0, 29, score) && "U");
           break;
         case "prc":
-          grade = rangeCompare(95, 100, score) && "A+" || rangeCompare(90, 94, score) && "A" || rangeCompare(85, 89, score) && "A-" || rangeCompare(80, 84, score) && "B+" || rangeCompare(75, 79, score) && "B" || rangeCompare(70, 74, score) && "B-" || rangeCompare(65, 69, score) && "C+" || rangeCompare(60, 64, score) && "C" || rangeCompare(56, 59, score) && "C-" || rangeCompare(50, 55, score) && "D" || rangeCompare(40, 49, score) && "E" || rangeCompare(30, 39, score) && "F" || rangeCompare(0, 29, score) && "U";
+          grade =
+            (rangeCompare(95, 100, score) && "A+") ||
+            (rangeCompare(90, 94, score) && "A") ||
+            (rangeCompare(85, 89, score) && "A-") ||
+            (rangeCompare(80, 84, score) && "B+") ||
+            (rangeCompare(75, 79, score) && "B") ||
+            (rangeCompare(70, 74, score) && "B-") ||
+            (rangeCompare(65, 69, score) && "C+") ||
+            (rangeCompare(60, 64, score) && "C") ||
+            (rangeCompare(56, 59, score) && "C-") ||
+            (rangeCompare(50, 55, score) && "D") ||
+            (rangeCompare(40, 49, score) && "E") ||
+            (rangeCompare(30, 39, score) && "F") ||
+            (rangeCompare(0, 29, score) && "U");
           break;
         case "igcse":
-          grade = rangeCompare(90, 100, score) && "A*" || rangeCompare(80, 89, score) && "A" || rangeCompare(70, 79, score) && "B" || rangeCompare(60, 69, score) && "C" || rangeCompare(50, 59, score) && "D" || rangeCompare(40, 49, score) && "E" || rangeCompare(30, 39, score) && "F" || rangeCompare(20, 29, score) && "G" || rangeCompare(0, 19, score) && "U";
+          grade =
+            (rangeCompare(90, 100, score) && "A*") ||
+            (rangeCompare(80, 89, score) && "A") ||
+            (rangeCompare(70, 79, score) && "B") ||
+            (rangeCompare(60, 69, score) && "C") ||
+            (rangeCompare(50, 59, score) && "D") ||
+            (rangeCompare(40, 49, score) && "E") ||
+            (rangeCompare(30, 39, score) && "F") ||
+            (rangeCompare(20, 29, score) && "G") ||
+            (rangeCompare(0, 19, score) && "U");
           break;
         case "waec":
-          grade = rangeCompare(80, 100, score) && "A1" || rangeCompare(75, 79, score) && "B2" || rangeCompare(70, 74, score) && "B3" || rangeCompare(60, 69, score) && "C4" || rangeCompare(56, 59, score) && "C5" || rangeCompare(50, 55, score) && "C6" || rangeCompare(45, 49, score) && "D7" || rangeCompare(40, 44, score) && "E8" || rangeCompare(0, 39, score) && "F9";
+          grade =
+            (rangeCompare(80, 100, score) && "A1") ||
+            (rangeCompare(75, 79, score) && "B2") ||
+            (rangeCompare(70, 74, score) && "B3") ||
+            (rangeCompare(60, 69, score) && "C4") ||
+            (rangeCompare(56, 59, score) && "C5") ||
+            (rangeCompare(50, 55, score) && "C6") ||
+            (rangeCompare(45, 49, score) && "D7") ||
+            (rangeCompare(40, 44, score) && "E8") ||
+            (rangeCompare(0, 39, score) && "F9");
           break;
         case "aslevel":
-          grade = rangeCompare(80, 100, score) && "a" || rangeCompare(70, 79, score) && "b" || rangeCompare(60, 69, score) && "c" || rangeCompare(50, 59, score) && "d" || rangeCompare(40, 49, score) && "e" || rangeCompare(0, 39, score) && "u";
+          grade =
+            (rangeCompare(80, 100, score) && "a") ||
+            (rangeCompare(70, 79, score) && "b") ||
+            (rangeCompare(60, 69, score) && "c") ||
+            (rangeCompare(50, 59, score) && "d") ||
+            (rangeCompare(40, 49, score) && "e") ||
+            (rangeCompare(0, 39, score) && "u");
           break;
         default:
           break;
@@ -2763,7 +2958,7 @@ var require_aggregateScores = __commonJS({
               value: getGrade(
                 req.body.gradingScale,
                 parseInt(item[item.length - 1].value)
-              )
+              ),
             });
           }
           if (req.body.type === "endOfTerm") {
@@ -2771,8 +2966,8 @@ var require_aggregateScores = __commonJS({
             item.push({
               value: average([
                 parseInt(item[item.length - 1].value),
-                parseInt(item[item.length - 2].value)
-              ])
+                parseInt(item[item.length - 2].value),
+              ]),
             });
             scores.push(parseInt(item[item.length - 1].value));
             console.log(item[item.length - 1]);
@@ -2780,7 +2975,7 @@ var require_aggregateScores = __commonJS({
               value: getGrade(
                 req.body.gradingScale,
                 parseInt(item[item.length - 1].value)
-              )
+              ),
             });
           }
         }
@@ -2797,7 +2992,7 @@ var require_aggregateScores = __commonJS({
       next();
     }
     module2.exports = computeGrade;
-  }
+  },
 });
 
 // middlewares/generateResultPDF.js
@@ -2811,31 +3006,63 @@ var require_generateResultPDF = __commonJS({
       doc.roundedRect(30, 30, 535.28, 781.89, 50).stroke();
       doc.image("static/images/logos/logo.png", 50, 50, { width: 50 });
       doc.image("static/images/logos/logo.png", 495, 50, { width: 50 });
-      doc.font("Times-Bold").fontSize(25).text(`${result.school.toUpperCase()}`, {
-        bold: true,
-        align: "center"
-      }).moveDown(0.5);
-      doc.fontSize(11).text(`${result.title.toUpperCase()}`, {
-        bold: true,
-        align: "center"
-      }).moveDown();
-      doc.fontSize(13).text(`${result.class.name.toUpperCase()}`, {
-        bold: true
-      }).moveDown();
-      doc.lineCap("round").lineWidth(4).moveTo(50, 165).lineTo(545.28, 165).stroke();
-      doc.lineCap("round").lineWidth(4).moveTo(50, 210).lineTo(545.28, 210).stroke();
-      doc.text("Candidate Name", 70, 175).text("Session", 230, 175).text("Overall Percentage", 320, 175).text("Grade", 470, 175);
-      doc.fontSize(9).text(
-        `${result.student.firstName.toUpperCase()} ${result.student.lastName.toUpperCase()}`,
-        70,
-        190
-      ).text(result.session, 230, 190).text(`${result.overallPercentage}%`, 320, 190).text(result.overallGrade, 470, 190);
+      doc
+        .font("Times-Bold")
+        .fontSize(25)
+        .text(`${result.school.toUpperCase()}`, {
+          bold: true,
+          align: "center",
+        })
+        .moveDown(0.5);
+      doc
+        .fontSize(11)
+        .text(`${result.title.toUpperCase()}`, {
+          bold: true,
+          align: "center",
+        })
+        .moveDown();
+      doc
+        .fontSize(13)
+        .text(`${result.class.name.toUpperCase()}`, {
+          bold: true,
+        })
+        .moveDown();
+      doc
+        .lineCap("round")
+        .lineWidth(4)
+        .moveTo(50, 165)
+        .lineTo(545.28, 165)
+        .stroke();
+      doc
+        .lineCap("round")
+        .lineWidth(4)
+        .moveTo(50, 210)
+        .lineTo(545.28, 210)
+        .stroke();
+      doc
+        .text("Candidate Name", 70, 175)
+        .text("Session", 230, 175)
+        .text("Overall Percentage", 320, 175)
+        .text("Grade", 470, 175);
+      doc
+        .fontSize(9)
+        .text(
+          `${result.student.firstName.toUpperCase()} ${result.student.lastName.toUpperCase()}`,
+          70,
+          190
+        )
+        .text(result.session, 230, 190)
+        .text(`${result.overallPercentage}%`, 320, 190)
+        .text(result.overallGrade, 470, 190);
       const scoreSheet = JSON.parse(result.scoreSheet);
       let col = 70;
       let row = 250;
       scoreSheet.shift();
       if (result.type === "midTerm") {
-        doc.text("SYLLABUS TITLE", 70, 230).text("SCORE", 320, 230).text("GRADE", 470, 230);
+        doc
+          .text("SYLLABUS TITLE", 70, 230)
+          .text("SCORE", 320, 230)
+          .text("GRADE", 470, 230);
         scoreSheet.forEach((item, index, array) => {
           item.forEach((item2, index2) => {
             if (index2 === 0) {
@@ -2847,14 +3074,22 @@ var require_generateResultPDF = __commonJS({
             if (index2 === 2) {
               col = 470;
             }
-            doc.text(item2.value.toString().toUpperCase(), col, row, { bold: true });
+            doc.text(item2.value.toString().toUpperCase(), col, row, {
+              bold: true,
+            });
             col += 100;
           });
           row += 20;
         });
       }
       if (result.type === "endOfTerm") {
-        doc.fontSize(9).text("SYLLABUS TITLE", 70, 230).text("TEST", 300, 230).text("EXAM", 340, 230).text("AVG. PERCENTAGE", 390, 230).text("GRADE", 490, 230);
+        doc
+          .fontSize(9)
+          .text("SYLLABUS TITLE", 70, 230)
+          .text("TEST", 300, 230)
+          .text("EXAM", 340, 230)
+          .text("AVG. PERCENTAGE", 390, 230)
+          .text("GRADE", 490, 230);
         scoreSheet.forEach((item, index, array) => {
           item.forEach((item2, index2) => {
             if (index2 === 0) {
@@ -2872,7 +3107,9 @@ var require_generateResultPDF = __commonJS({
             if (index2 === 4) {
               col = 490;
             }
-            doc.text(item2.value.toString().toUpperCase(), col, row, { bold: true });
+            doc.text(item2.value.toString().toUpperCase(), col, row, {
+              bold: true,
+            });
             col += 100;
           });
           row += 20;
@@ -2885,24 +3122,54 @@ var require_generateResultPDF = __commonJS({
         row += 15;
       } else {
         result.electives.forEach((elective, index) => {
-          doc.lineWidth(0.5).rect(50, row, 80, 20).stroke().fontSize(11).text(elective.title, 53, row + 2);
-          doc.lineWidth(0.5).rect(130, row, 80, 20).stroke().fontSize(11).text(elective.grade, 133, row + 2);
+          doc
+            .lineWidth(0.5)
+            .rect(50, row, 80, 20)
+            .stroke()
+            .fontSize(11)
+            .text(elective.title, 53, row + 2);
+          doc
+            .lineWidth(0.5)
+            .rect(130, row, 80, 20)
+            .stroke()
+            .fontSize(11)
+            .text(elective.grade, 133, row + 2);
           row += 20;
         });
       }
       row += 10;
-      doc.lineWidth(1).rect(50, row, 150, 40).stroke().fontSize(11).text("CLASS TEACHER'S REMARK", 53, row + 3, { width: 150 });
-      doc.lineWidth(1).rect(50 + 150, row, 350, 40).stroke().fontSize(11).text(result.teachersRemark, 53 + 150, row + 3);
-      doc.lineWidth(1).rect(50, row + 40, 500, 90).stroke().fontSize(14).text("Principal's Remark and Signature:", 54, row + 44, { bold: true }).fontSize(11).text(result.principalsRemark, 54, row + 65);
+      doc
+        .lineWidth(1)
+        .rect(50, row, 150, 40)
+        .stroke()
+        .fontSize(11)
+        .text("CLASS TEACHER'S REMARK", 53, row + 3, { width: 150 });
+      doc
+        .lineWidth(1)
+        .rect(50 + 150, row, 350, 40)
+        .stroke()
+        .fontSize(11)
+        .text(result.teachersRemark, 53 + 150, row + 3);
+      doc
+        .lineWidth(1)
+        .rect(50, row + 40, 500, 90)
+        .stroke()
+        .fontSize(14)
+        .text("Principal's Remark and Signature:", 54, row + 44, { bold: true })
+        .fontSize(11)
+        .text(result.principalsRemark, 54, row + 65);
       if (result.isApproved) {
-        doc.font("Helvetica-BoldOblique").fontSize(13).text("AMA", 480, row + 115, { bold: true });
+        doc
+          .font("Helvetica-BoldOblique")
+          .fontSize(13)
+          .text("AMA", 480, row + 115, { bold: true });
       }
       doc.end();
       res2.setHeader("Content-Disposition", "attachment; result.pdf");
       doc.pipe(res2);
     }
     module2.exports = generateResultPDF;
-  }
+  },
 });
 
 // middlewares/index.js
@@ -2916,9 +3183,9 @@ var require_middlewares = __commonJS({
       verifyAccessToken,
       generateStudentID,
       aggregateScores,
-      generateResultPDF
+      generateResultPDF,
     };
-  }
+  },
 });
 
 // routers/student.js
@@ -2944,7 +3211,7 @@ var require_student2 = __commonJS({
         {
           paginate: request.query.paginate === "true" ? true : false,
           count: request.query.count ? parseInt(request.query.count) : 10,
-          page: request.query.page ? parseInt(request.query.page) : 1
+          page: request.query.page ? parseInt(request.query.page) : 1,
         },
         (error, students) => {
           if (error) {
@@ -3084,17 +3351,19 @@ var require_student2 = __commonJS({
     router.get("/:studentID/notifications", (request, response) => {
       studentController.notifications.findAll(
         request.params.studentID.replace(/-/g, "/"),
-        (error, notifications) => {
-        }
+        (error, notifications) => {}
       );
     });
-    router.get("/:studentID/notifications", studentController.getAllNotifications);
+    router.get(
+      "/:studentID/notifications",
+      studentController.getAllNotifications
+    );
     router.post("/:studentID/profile/edit", studentController.editProfile);
     router.get("/activate/:studentID", studentController.activate);
     router.get("/deactivate/:studentID", studentController.deactivate);
     router.get("/delete/:studentID", studentController._delete);
     module2.exports = router;
-  }
+  },
 });
 
 // routers/teacher.js
@@ -3172,7 +3441,9 @@ var require_teacher2 = __commonJS({
             response.status(400).send(error);
           } else {
             if (teacher) {
-              response.status(400).send("Teacher with this e-mail address already exists!");
+              response
+                .status(400)
+                .send("Teacher with this e-mail address already exists!");
             } else {
               teacherController.createTeacher(
                 { ...request.body },
@@ -3200,13 +3471,16 @@ var require_teacher2 = __commonJS({
                   response.status(400).send(error);
                 } else {
                   if (teacher) {
-                    teacherController.deleteTeacherByID(teacher._id, (error2) => {
-                      if (error2) {
-                        response.status(400).send(error2);
-                      } else {
-                        response.status(200).end();
+                    teacherController.deleteTeacherByID(
+                      teacher._id,
+                      (error2) => {
+                        if (error2) {
+                          response.status(400).send(error2);
+                        } else {
+                          response.status(200).end();
+                        }
                       }
-                    });
+                    );
                   } else {
                     response.status(400).send(`teacher does not exist`);
                   }
@@ -3240,7 +3514,7 @@ var require_teacher2 = __commonJS({
     });
     router.get("/:id", teacherController.getTeacher);
     module2.exports = router;
-  }
+  },
 });
 
 // routers/class.js
@@ -3267,7 +3541,7 @@ var require_class2 = __commonJS({
         {
           paginate: request.query.paginate === "true" ? true : false,
           count: request.query.count ? parseInt(request.query.count) : 10,
-          page: request.query.page ? parseInt(request.query.page) : 1
+          page: request.query.page ? parseInt(request.query.page) : 1,
         },
         (error, classes) => {
           if (error) {
@@ -3295,17 +3569,20 @@ var require_class2 = __commonJS({
             });
             break;
           case "name":
-            classController.findClassByName(request.query.name, (error, _class) => {
-              if (error) {
-                response.status(400).send(error);
-              } else {
-                if (_class) {
-                  response.status(200).json(_class);
+            classController.findClassByName(
+              request.query.name,
+              (error, _class) => {
+                if (error) {
+                  response.status(400).send(error);
                 } else {
-                  response.status(400).send(`class does not exist`);
+                  if (_class) {
+                    response.status(200).json(_class);
+                  } else {
+                    response.status(400).send(`class does not exist`);
+                  }
                 }
               }
-            });
+            );
             break;
           default:
             response.status(400).send("Incorrect query parameters");
@@ -3396,7 +3673,7 @@ var require_class2 = __commonJS({
     router.post("/:classID/subjects/add", classController.addSubject);
     router.post("/:classID/subjects/delete", classController.deleteSubject);
     module2.exports = router;
-  }
+  },
 });
 
 // routers/result.js
@@ -3413,7 +3690,7 @@ var require_result2 = __commonJS({
         {
           paginate: request.query.paginate === "true" ? true : false,
           count: request.query.count ? parseInt(request.query.count) : 20,
-          page: request.query.page ? parseInt(request.query.page) : 1
+          page: request.query.page ? parseInt(request.query.page) : 1,
         },
         (error, results) => {
           if (error) {
@@ -3498,7 +3775,7 @@ var require_result2 = __commonJS({
       });
     });
     module2.exports = router;
-  }
+  },
 });
 
 // middlewares/imageUpload.js
@@ -3509,16 +3786,16 @@ var require_imageUpload = __commonJS({
       destination: (req, file, cb) => {
         cb(null, "./");
       },
-      filename: function(req, file, cb) {
+      filename: function (req, file, cb) {
         const ext = file.mimetype.split("/")[1];
         cb(null, `uploads/${req.body.fileName}.jpeg`);
-      }
+      },
     });
     var upload = multer2({
-      storage
+      storage,
     });
     module2.exports = upload;
-  }
+  },
 });
 
 // routers/image.js
@@ -3535,7 +3812,7 @@ var require_image = __commonJS({
       }
     });
     module2.exports = router;
-  }
+  },
 });
 
 // routers/admin.js
@@ -3551,7 +3828,7 @@ var require_admin2 = __commonJS({
         {
           paginate: request.query.paginate === "true" ? true : false,
           count: request.query.count ? parseInt(request.query.count) : 10,
-          page: request.query.page ? parseInt(request.query.page) : 1
+          page: request.query.page ? parseInt(request.query.page) : 1,
         },
         (error, admins) => {
           if (error) {
@@ -3572,20 +3849,23 @@ var require_admin2 = __commonJS({
             if (document2) {
               response.status(400).send("This email already exists");
             } else {
-              adminController.createAdmin({ ...request.body }, (error2, admin) => {
-                if (error2) {
-                  response.status(400).send(error2);
-                } else {
-                  response.status(200).json(admin);
+              adminController.createAdmin(
+                { ...request.body },
+                (error2, admin) => {
+                  if (error2) {
+                    response.status(400).send(error2);
+                  } else {
+                    response.status(200).json(admin);
+                  }
                 }
-              });
+              );
             }
           }
         }
       );
     });
     module2.exports = adminRouter2;
-  }
+  },
 });
 
 // routers/term.js
@@ -3599,7 +3879,7 @@ var require_term2 = __commonJS({
     termRouter.get("/", termController.getTerm);
     termRouter.post("/set", termController.setTerm);
     module2.exports = termRouter;
-  }
+  },
 });
 
 // routers/session.js
@@ -3611,7 +3891,7 @@ var require_session2 = __commonJS({
     router.get("/", sessionController.getSession);
     router.post("/set", sessionController.setSession);
     module2.exports = router;
-  }
+  },
 });
 
 // routers/invoice.js
@@ -3628,13 +3908,13 @@ var require_invoice2 = __commonJS({
       deleteByID,
       getAll,
       deleteAll,
-      create
+      create,
     } = invoiceController;
     var invoiceRouter2 = Router();
     invoiceRouter2.get("/find-all", (request, response) => {
       invoiceController.findAllInvoices(
         {
-          paginate: request.query.paginate === "true" ? true : false
+          paginate: request.query.paginate === "true" ? true : false,
         },
         (error, invoices) => {
           if (error) {
@@ -3657,17 +3937,20 @@ var require_invoice2 = __commonJS({
     invoiceRouter2.get("/find-one", (request, response) => {
       if (request.query.by) {
         if (request.query.by === "ID") {
-          invoiceController.findInvoiceByID(request.query.ID, (error, invoice) => {
-            if (error) {
-              response.status(400).send(error);
-            } else {
-              if (invoice) {
-                response.status(200).json(invoice);
+          invoiceController.findInvoiceByID(
+            request.query.ID,
+            (error, invoice) => {
+              if (error) {
+                response.status(400).send(error);
               } else {
-                response.status(400).send("Invoice not found!");
+                if (invoice) {
+                  response.status(200).json(invoice);
+                } else {
+                  response.status(400).send("Invoice not found!");
+                }
               }
             }
-          });
+          );
         }
       } else {
         response.status(400).send("Incorrect query parameters");
@@ -3741,34 +4024,43 @@ var require_invoice2 = __commonJS({
       }
     });
     invoiceRouter2.post("/templates/create", (request, response) => {
-      invoiceController.templates.createInvoice({ ...request.body }, (error) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).end();
+      invoiceController.templates.createInvoice(
+        { ...request.body },
+        (error) => {
+          if (error) {
+            response.status(400).send(error);
+          } else {
+            response.status(200).end();
+          }
         }
-      });
+      );
     });
     invoiceRouter2.get("/templates/:ID/update", (request, response) => {
-      invoiceController.templates.updateInvoiceByID(request.params.ID, (error) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).end();
+      invoiceController.templates.updateInvoiceByID(
+        request.params.ID,
+        (error) => {
+          if (error) {
+            response.status(400).send(error);
+          } else {
+            response.status(200).end();
+          }
         }
-      });
+      );
     });
     invoiceRouter2.get("/templates/:ID/delete", (request, response) => {
-      invoiceController.templates.deleteInvoiceByID(request.params.ID, (error) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).end();
+      invoiceController.templates.deleteInvoiceByID(
+        request.params.ID,
+        (error) => {
+          if (error) {
+            response.status(400).send(error);
+          } else {
+            response.status(200).end();
+          }
         }
-      });
+      );
     });
     module2.exports = invoiceRouter2;
-  }
+  },
 });
 
 // routers/fee.js
@@ -3783,7 +4075,7 @@ var require_fee2 = __commonJS({
     feeRouter2.post("/", feeController.createFee);
     feeRouter2.delete("/:feeID", feeController.deleteFee);
     module2.exports = feeRouter2;
-  }
+  },
 });
 
 // routers/notification.js
@@ -3793,19 +4085,14 @@ var require_notification3 = __commonJS({
     var controllers = require_controllers();
     var { Router } = express2;
     var { notificationController } = controllers;
-    var {
-      getAll,
-      create,
-      deleteByID,
-      updateByID
-    } = notificationController;
+    var { getAll, create, deleteByID, updateByID } = notificationController;
     var notificationRouter2 = Router();
     notificationRouter2.get("/", getAll);
     notificationRouter2.post("/", create);
     notificationRouter2.patch("/:notificationID", updateByID);
     notificationRouter2.delete("/:notificationID", deleteByID);
     module2.exports = notificationRouter2;
-  }
+  },
 });
 
 // routers/auth.js
@@ -3845,20 +4132,22 @@ var require_auth2 = __commonJS({
     });
     authRouter2.post("/sign-in/admin", authController.signin.admin);
     authRouter2.get("/verify-access-token", (request, response) => {
-      authController.verifyAccessToken(request.query.accessToken, (error, data2) => {
-        if (error) {
-          response.status(400).send(error.message);
-        } else {
-          response.status(200).json(data2);
+      authController.verifyAccessToken(
+        request.query.accessToken,
+        (error, data2) => {
+          if (error) {
+            response.status(400).send(error.message);
+          } else {
+            response.status(200).json(data2);
+          }
         }
-      });
+      );
     });
     authRouter2.get("/sign-out/student", (request, response) => {
-      authController.signOut.student((error) => {
-      });
+      authController.signOut.student((error) => {});
     });
     module2.exports = authRouter2;
-  }
+  },
 });
 
 // routers/announcement.js
@@ -3882,7 +4171,7 @@ var require_announcement3 = __commonJS({
       announcementController.findAnnouncements(
         {
           by: request.query.by || "",
-          visibility: request.body.visibility || "all"
+          visibility: request.body.visibility || "all",
         },
         (error, announcements) => {
           if (error) {
@@ -3897,7 +4186,7 @@ var require_announcement3 = __commonJS({
       announcementController.createAnnouncement(
         { ...request.body },
         {
-          visibility: request.body.visibility || "general"
+          visibility: request.body.visibility || "general",
         },
         (error, announcement) => {
           if (error) {
@@ -3909,13 +4198,16 @@ var require_announcement3 = __commonJS({
       );
     });
     announcementRouter2.get("/delete-one", (request, response) => {
-      announcementController.deleteAnnouncementByID(request.query.ID, (error) => {
-        if (error) {
-          response.status(400).send(error);
-        } else {
-          response.status(200).end();
+      announcementController.deleteAnnouncementByID(
+        request.query.ID,
+        (error) => {
+          if (error) {
+            response.status(400).send(error);
+          } else {
+            response.status(200).end();
+          }
         }
-      });
+      );
     });
     announcementRouter2.get("/update-one", (request, response) => {
       announcementController.updateAnnouncementByID(
@@ -3931,7 +4223,7 @@ var require_announcement3 = __commonJS({
       );
     });
     module2.exports = announcementRouter2;
-  }
+  },
 });
 
 // routers/index.js
@@ -3963,9 +4255,9 @@ var require_routers = __commonJS({
       feeRouter: feeRouter2,
       notificationRouter: notificationRouter2,
       authRouter: authRouter2,
-      announcementRouter: announcementRouter2
+      announcementRouter: announcementRouter2,
     };
-  }
+  },
 });
 
 // index.js
@@ -3979,7 +4271,7 @@ var models = require_models();
 mongoose.connect(process.env.MONGOURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  autoIndex: false
+  autoIndex: false,
 });
 var {
   studentRouter,
@@ -3994,7 +4286,7 @@ var {
   feeRouter,
   notificationRouter,
   authRouter,
-  announcementRouter
+  announcementRouter,
 } = routers;
 var { invoiceModel, resultModel } = models;
 invoiceModel.default();

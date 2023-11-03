@@ -2,9 +2,37 @@ const router = require("express").Router();
 const multer = require("multer");
 const controllers = require("../controllers");
 const middlewares = require("../middlewares");
+const models = require("../models");
 
 const { studentController } = controllers;
 const { generateStudentID } = middlewares;
+
+router.param("student_id", async (request, response, next) => {
+  try {
+    const student = await models.student.findOne({
+      _id: request.params.student_id.replaceAll("-", "/"),
+    });
+    if (!student) {
+      return response.status(400).json({
+        message: "Student not found!",
+        error: true,
+        data: null,
+        statusCode: 400,
+      });
+    }
+    request.payload = { ...request.payload, student: student };
+    next();
+  } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    return response.status(400).json({
+      message: "Unable to process this request!",
+      error: true,
+      data: null,
+      statusCode: 400,
+    });
+  }
+});
 
 router.get("/metrics", controllers.studentController.metrics);
 
@@ -25,7 +53,10 @@ router.get("/find-one", controllers.studentController.findOne);
 router.post("/update-one", controllers.studentController.updateOne);
 
 router.get("/search", controllers.studentController.search);
-router.get("/activity-logs/find-all", controllers.studentController.activityLogs.findAll)
+router.get(
+  "/activity-logs/find-all",
+  controllers.studentController.activityLogs.findAll
+);
 
 router.get("/find-one-deprecated", (request, response) => {
   if (request.query.by) {
@@ -85,7 +116,12 @@ router.post("/create", generateStudentID, (request, response) => {
 
 router.get("/:studentID", studentController.getStudent);
 
-router.get("/:studentID/results", (request, response) => {
+router.get(
+  "/:student_id/results/find",
+  controllers.student.single.results.find
+);
+
+router.get("/:studentID/results-deprecated", (request, response) => {
   studentController.results.findAll(
     request.params.studentID.replace(/-/g, "/"),
     (error, results) => {

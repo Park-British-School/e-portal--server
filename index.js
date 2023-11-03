@@ -6,6 +6,8 @@ const morgan = require("morgan");
 const multer = require("multer");
 const routers = require("./routers");
 const models = require("./models");
+const http = require("node:http");
+const socket = require("socket.io");
 
 mongoose.connect(process.env.MONGOURI, {
   useNewUrlParser: true,
@@ -30,48 +32,71 @@ const {
 
 const { invoiceModel } = models;
 invoiceModel.default();
+const app = express();
+const server = http.createServer(app);
+const io = new socket.Server(server, {
+  path: "/api/socket.io",
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+  transports: [
+    "websocket",
+    "flashsocket",
+    "htmlfile",
+    "xhr-polling",
+    "jsonp-polling",
+    "polling",
+  ],
+  allowEIO3: true,
+});
+app.use(morgan("combined"));
+app.use(cors({ origin: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use("/", express.static(__dirname));
+app.use("/admins", routers.administratorRouter);
+app.use("/students", studentRouter);
+app.use("/teachers", teacherRouter);
+app.use("/classes", classRouter);
+app.use("/results", resultRouter);
+app.use("/images", imageRouter);
+app.use("/term", termRouter);
+app.use("/session", sessionRouter);
+app.use("/invoices", invoiceRouter);
+app.use("/fees", feeRouter);
+app.use("/notifications", notificationRouter);
+app.use("/auth", authRouter);
+app.use("/announcements", announcementRouter);
 
-const server = express();
-server.use(morgan("combined"));
-server.use(cors({ origin: true }));
-server.use(express.json({ limit: "50mb" }));
-server.use(express.urlencoded({ limit: "50mb", extended: true }));
-server.use("/", express.static(__dirname));
-server.use("/admins", routers.administratorRouter);
-server.use("/students", studentRouter);
-server.use("/teachers", teacherRouter);
-server.use("/classes", classRouter);
-server.use("/results", resultRouter);
-server.use("/images", imageRouter);
-server.use("/term", termRouter);
-server.use("/session", sessionRouter);
-server.use("/invoices", invoiceRouter);
-server.use("/fees", feeRouter);
-server.use("/notifications", notificationRouter);
-server.use("/auth", authRouter);
-server.use("/announcements", announcementRouter);
+app.use("/api/", express.static(__dirname));
+app.use("/api/administrators", routers.administratorRouter);
+app.use("/api/students", routers.studentRouter);
+app.use("/api/teachers", routers.teacherRouter);
+app.use("/api/classes", routers.classRouter);
+app.use("/api/results", routers.resultRouter);
+app.use("/api/images", imageRouter);
+app.use("/api/term", termRouter);
+app.use("/api/session", sessionRouter);
+app.use("/api/invoices", invoiceRouter);
+app.use("/api/fees", feeRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/announcements", announcementRouter);
+app.use("/api/variables", routers.variableRouter);
+app.use("/api/conversations", routers.conversation);
 
-server.use("/api/", express.static(__dirname));
-server.use("/api/administrators", routers.administratorRouter);
-server.use("/api/students", routers.studentRouter);
-server.use("/api/teachers", routers.teacherRouter);
-server.use("/api/classes", routers.classRouter);
-server.use("/api/results", routers.resultRouter);
-server.use("/api/images", imageRouter);
-server.use("/api/term", termRouter);
-server.use("/api/session", sessionRouter);
-server.use("/api/invoices", invoiceRouter);
-server.use("/api/fees", feeRouter);
-server.use("/api/notifications", notificationRouter);
-server.use("/api/auth", authRouter);
-server.use("/api/announcements", announcementRouter);
-server.use("/api/variables", routers.variableRouter);
-
-server.get("/ping", (request, response) => {
+app.get("/ping", (request, response) => {
   console.log("PING!!!");
   response.status(200).end();
 });
 
 server.listen(process.env.PORT, () => {
   console.log(`server started at port ${process.env.PORT}`);
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected to /");
+  console.log(socket.id);
+  io.emit("connection_success");
 });

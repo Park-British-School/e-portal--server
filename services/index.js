@@ -1,2 +1,2 @@
-exports.postmark = require("./postmark")
-exports.cloudinary = require("./cloudinary")
+exports.postmark = require("./postmark");
+exports.cloudinary = require("./cloudinary");
