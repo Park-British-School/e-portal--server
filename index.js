@@ -88,7 +88,7 @@ app.use("/api/conversations", routers.conversation);
 
 app.get("/ping", (request, response) => {
   console.log("PING!!!");
-  response.status(200).end();
+  response.status(200).send("PINGV2");
 });
 
 server.listen(process.env.PORT, () => {

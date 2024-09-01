@@ -14,12 +14,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      - name: copy files to server
-        uses: garygrossgarten/github-action-scp@v0.8.0
+      - name: copy to server instance
+        uses: appleboy/scp-action@v0.1.7
         with:
-          local: /home/runner/work/e-portal--server/e-portal--server
-          remote: api/app
+          source: /home/runner/work/e-portal--server/e-portal--server
+          target: api/app/__update
           host: 167.99.139.37
+          port: 22
           username: parkbritish
           password: alphabetagamma
       - name: restart account service
@@ -31,5 +32,6 @@ jobs:
           password: alphabetagamma
           script: |
             cd ./api/app
+            cp -r ./__update/github/workspace/. .
             npm install
-            pm2 restart index
+            pm2 restart all
