@@ -30,7 +30,7 @@ const {
   announcementRouter,
 } = routers;
 
-import v2Routers from "./v2/routers";
+const v2Routers = require("./v2/routers")
 
 const { invoiceModel } = models;
 invoiceModel.default();
