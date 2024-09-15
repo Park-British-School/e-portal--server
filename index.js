@@ -30,6 +30,8 @@ const {
   announcementRouter,
 } = routers;
 
+import v2Routers from "./v2/routers";
+
 const { invoiceModel } = models;
 invoiceModel.default();
 const app = express();
@@ -68,6 +70,7 @@ app.use("/fees", feeRouter);
 app.use("/notifications", notificationRouter);
 app.use("/auth", authRouter);
 app.use("/announcements", announcementRouter);
+app.use("/v2", v2Routers);
 
 app.use("/api/", express.static(__dirname));
 app.use("/api/administrators", routers.administratorRouter);
@@ -85,6 +88,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/announcements", announcementRouter);
 app.use("/api/variables", routers.variableRouter);
 app.use("/api/conversations", routers.conversation);
+app.use("/api/v2", v2Routers);
 
 app.get("/ping", (request, response) => {
   console.log("PING!!!");

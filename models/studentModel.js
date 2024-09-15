@@ -40,6 +40,11 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    pin: {
+      type: String,
+      required: true,
+      default: "0000",
+    },
     role: {
       type: String,
       lowercase: true,
