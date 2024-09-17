@@ -1,3 +1,5 @@
+const speakeasy = require("speakeasy");
+
 const models = require("../../models");
 
 const controller = {
@@ -37,6 +39,48 @@ const controller = {
       } catch (error) {
         console.log(error.message);
         console.log(error.stack);
+        return response.status(400).json({
+          message: "Unable to process this request",
+        });
+      }
+    },
+  },
+  pins: {
+    scramble: async function (request, response) {
+      try {
+        response.status(200).json({
+          message: "Success",
+          error: false,
+          data: null,
+          statusCode: 200,
+        });
+        try {
+          let students = await models.student.find({});
+          for (const student of students) {
+            const pin = await speakeasy.totp({
+              secret: student._id,
+              digits: 4,
+              encoding: "base32",
+            });
+
+            await models.student.updateOne(
+              {
+                _id: student._id,
+              },
+              {
+                $set: {
+                  pin: pin,
+                },
+              }
+            );
+          }
+        } catch (error) {
+          console.log(error.message);
+          console.log(error.stack);
+        }
+      } catch (error) {
+        console.log(error.stack);
+        console.log(error.message);
         return response.status(400).json({
           message: "Unable to process this request",
         });
