@@ -182,7 +182,7 @@ const updateOne = async function (request, response) {
         if (request.body.image) {
           fs.writeFile(
             `${__dirname}/../uploads/images/profile/${request.query.id}.jpg`,
-            req.body.image,
+            request.body.image,
             "base64",
             (err) => {
               if (err) {
