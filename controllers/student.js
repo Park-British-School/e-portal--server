@@ -179,7 +179,7 @@ const updateOne = async function (request, response) {
           { _id: request.query.id.replace(/-/g, "/") },
           { $set: { password: hashedPassword } }
         );
-        if (req.body.image) {
+        if (request.body.image) {
           fs.writeFile(
             `${__dirname}/../uploads/images/profile/${request.query.id}.jpg`,
             req.body.image,
