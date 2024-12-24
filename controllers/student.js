@@ -169,16 +169,7 @@ const updateOne = async function (request, response) {
           { _id: request.query.id.replace(/-/g, "/") },
           { ...request.body }
         );
-        return response
-          .status(200)
-          .json({ message: "Success!", statusCode: 200 });
-      case "update_password":
-        const salt = await bcrypt.genSalt(3);
-        const hashedPassword = await bcrypt.hash(request.body.password, salt);
-        await models.studentModel.updateOne(
-          { _id: request.query.id.replace(/-/g, "/") },
-          { $set: { password: hashedPassword } }
-        );
+
         if (request.body.image) {
           fs.writeFile(
             `${__dirname}/../uploads/images/profile/${request.query.id}.jpg`,
@@ -191,6 +182,17 @@ const updateOne = async function (request, response) {
             }
           );
         }
+        return response
+          .status(200)
+          .json({ message: "Success!", statusCode: 200 });
+      case "update_password":
+        const salt = await bcrypt.genSalt(3);
+        const hashedPassword = await bcrypt.hash(request.body.password, salt);
+        await models.studentModel.updateOne(
+          { _id: request.query.id.replace(/-/g, "/") },
+          { $set: { password: hashedPassword } }
+        );
+        
         return response
           .status(200)
           .json({ message: "Password updated successfully!", statusCode: 200 });
