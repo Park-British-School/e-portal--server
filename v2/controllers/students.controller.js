@@ -44,6 +44,50 @@ const controller = {
         });
       }
     },
+    update: async function (request, response) {
+      try {
+        let student = await models.student.findOne({
+          _id: request.params.id
+        })
+
+        if (!student) {
+          return response.status(404).json({
+            message: "Student not found",
+            error: true,
+            data: null,
+            statusCode: 404
+          }) 
+        }
+
+        if(request.body.image){
+          
+        }
+
+        await models.student.updateOne({
+          _id: student._id
+        }, {
+          $set: {
+            ...request.body
+          }
+        })
+        return response.status(200).json({
+          message: "Success",
+          error: false,
+          data: null,
+          statusCode: 400
+        })
+      }
+      catch (error) {
+        console.log(error.message)
+        console.log(error.stack)
+        return response.status(400).json({
+          message: "Unable to process this request",
+          error: true,
+          data: null,
+          statusCode: 400
+        })
+      }
+    }
   },
   pins: {
     scramble: async function (request, response) {

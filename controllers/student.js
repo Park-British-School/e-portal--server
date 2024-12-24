@@ -179,6 +179,18 @@ const updateOne = async function (request, response) {
           { _id: request.query.id.replace(/-/g, "/") },
           { $set: { password: hashedPassword } }
         );
+        if (req.body.image) {
+          fs.writeFile(
+            `${__dirname}/../uploads/images/profile/${request.query.id}.jpg`,
+            req.body.image,
+            "base64",
+            (err) => {
+              if (err) {
+                throw "upload rror";
+              }
+            }
+          );
+        }
         return response
           .status(200)
           .json({ message: "Password updated successfully!", statusCode: 200 });
@@ -391,7 +403,7 @@ exports.getAllNotifications = async function (request, response) {
   });
 };
 
-exports.deleteNotificationByID = async function (request, response) {};
+exports.deleteNotificationByID = async function (request, response) { };
 
 // REFACTORING STARTS HERE
 

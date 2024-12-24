@@ -9,6 +9,9 @@ const studentSchema = new mongoose.Schema(
       required: true,
       index: false,
     },
+    image: {
+      type: String,
+    },
     firstName: {
       type: String,
       lowercase: true,
